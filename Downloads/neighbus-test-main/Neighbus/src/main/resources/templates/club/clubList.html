@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동아리 - NEIGHBUS</title>
+    
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<link rel="stylesheet" href="/css/navibar.css">
+    
+    <style>
+        /* [기억된 디자인] 사용자 지정 변수: Earth Tone */
+        :root {
+            --bs-primary: #A67C52; /* Primary Brown */
+            --bs-secondary: #8D6E63; /* Text Secondary */
+            --bs-success: #5A8B73; /* Status Green */
+            --bs-light: #FFF8F0; /* Background Ivory */
+            --bs-white: #FFFFFF;
+            --bs-body-bg: var(--bs-light);
+            --bs-body-color: #5D4037; /* Text Primary */
+            --bs-border-color: #E8D7C3;
+        }
+
+        body {
+            font-family: 'SUIT', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--bs-body-bg);
+            color: var(--bs-body-color);
+        }
+
+        /* 메인 래퍼: 배경 그라데이션 */
+        .main-wrapper {
+            min-height: 100vh;
+			padding: 60px;
+            background: linear-gradient(165deg, #FFF8F0 0%, #FFF5EB 50%, #FAF0E6 100%);
+        }
+
+        .page-title {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--bs-body-color);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: var(--bs-secondary);
+        }
+        
+        /* 커스텀 버튼 */
+        .btn-primary-custom {
+            background-color: var(--bs-primary);
+            color: var(--bs-white);
+            border: none;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(166, 124, 82, 0.15);
+        }
+        .btn-primary-custom:hover {
+            background-color: #8D6E63;
+            color: var(--bs-white);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(166, 124, 82, 0.25);
+        }
+        
+        /* 필터 박스 디자인 */
+        .filter-box {
+            background: #FFFBF7;
+            border: 1px solid var(--bs-border-color);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 4px 20px rgba(166, 124, 82, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .filter-box:hover {
+            box-shadow: 0 8px 30px rgba(166, 124, 82, 0.25);
+        }
+
+        /* 카테고리 드롭다운 */
+        .category-select {
+            appearance: none;
+            padding: 0.75rem 2.5rem 0.75rem 1.25rem;
+            background-color: #FFFBF7;
+            border: 1px solid var(--bs-border-color);
+            border-radius: 12px;
+            font-family: 'SUIT', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--bs-body-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(166, 124, 82, 0.15);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%238D6E63' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            min-width: 220px;
+            width: 100%;
+        }
+
+        .category-select:hover {
+            border-color: var(--bs-primary);
+            box-shadow: 0 6px 20px rgba(166, 124, 82, 0.25);
+        }
+
+        .category-select:focus {
+            outline: none;
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.1);
+        }
+
+        /* 폼 요소 스타일 */
+        .form-label {
+            font-weight: 600;
+            color: var(--bs-body-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .input-group-text {
+            background: var(--bs-white);
+            border: 1px solid var(--bs-border-color);
+            border-right: none;
+            color: #A1887F;
+        }
+
+        .form-control {
+            border: 1px solid var(--bs-border-color);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            color: var(--bs-body-color);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.1);
+            outline: none;
+        }
+
+        .form-control::placeholder {
+            color: #A1887F;
+        }
+
+        .btn-search {
+            background: var(--bs-primary);
+            color: var(--bs-white);
+            border: none;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(166, 124, 82, 0.15);
+        }
+
+        .btn-search:hover {
+            background: #8D6E63;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(166, 124, 82, 0.25);
+        }
+
+        /* 카드 디자인 및 호버 효과 */
+        .club-card {
+            border: none;
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bs-white);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow:
+                0 2px 8px rgba(166, 124, 82, 0.08),
+                0 4px 16px rgba(166, 124, 82, 0.06),
+                0 0 0 1px rgba(166, 124, 82, 0.04);
+            position: relative;
+        }
+        .club-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 24px;
+            padding: 2px;
+            background: linear-gradient(135deg, rgba(166, 124, 82, 0.1) 0%, rgba(201, 168, 138, 0.05) 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .club-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow:
+                0 8px 24px rgba(166, 124, 82, 0.15),
+                0 16px 48px rgba(166, 124, 82, 0.1),
+                0 0 0 1px rgba(166, 124, 82, 0.08),
+                0 0 48px rgba(166, 124, 82, 0.08);
+        }
+        .club-card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-image-wrapper {
+            position: relative;
+            overflow: hidden;
+            height: 280px;
+        }
+        .card-image-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(93, 64, 55, 0.03) 100%);
+            pointer-events: none;
+        }
+
+        .card-image {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .club-card:hover .card-image {
+            transform: scale(1.1);
+        }
+
+        /* 카드 오버레이 */
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--bs-primary) 0%, #C9A88A 50%, var(--bs-primary) 100%);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -2px 12px rgba(166, 124, 82, 0.3);
+        }
+        .club-card:hover .card-overlay {
+            transform: scaleX(1);
+        }
+
+        /* 페이지네이션 커스텀 */
+        .page-link {
+            color: var(--bs-secondary);
+            border: 1px solid var(--bs-border-color);
+            background-color: var(--bs-white);
+            margin: 0 3px;
+            border-radius: 5px;
+        }
+        .page-link:hover {
+            color: var(--bs-primary);
+            background-color: #FFF5EB;
+        }
+        .page-item.active .page-link {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: var(--bs-white);
+        }
+        
+        /* 상태 뱃지 */
+        .status-badge {
+            background: linear-gradient(135deg, var(--bs-primary) 0%, #8D6E63 100%);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4em 1em;
+            border-radius: 50rem;
+            box-shadow: 0 2px 8px rgba(166, 124, 82, 0.25);
+            transition: all 0.3s ease;
+        }
+        .club-card:hover .status-badge {
+            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.35);
+            transform: translateY(-2px);
+        }
+
+        /* 지역 뱃지 */
+        .badge.bg-white {
+            border-radius: 12px;
+            padding: 0.5em 1em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95) !important;
+        }
+		
+		@keyframes fadeInSlideUp {
+		    from {
+		        opacity: 0;
+		        transform: translateY(30px);
+		    }
+		    to {
+		        opacity: 1;
+		        transform: translateY(0);
+		    }
+		}
+
+		.club-card:nth-child(1) { animation-delay: 0.3s; }
+		.club-card:nth-child(2) { animation-delay: 0.4s; }
+		.club-card:nth-child(3) { animation-delay: 0.5s; }
+		
+		.animation {
+		    animation: fadeInSlideUp 1s ease-out;
+		}
+		
+    </style>
+</head>
+<body>
+	<div th:replace="~{include/navibar :: header-nav}"></div>
+
+    <div class="main-wrapper">
+        <div class="container animation">
+            <div class="text-center mb-5">
+                <h1 class="page-title mb-2">동아리</h1>
+                <p class="page-subtitle">관심사로 함께하는 우리 동네 모임</p>
+            </div>
+				
+            <form th:action="@{/club}" method="get" id="filterForm" class="mb-5">
+				<div class="d-flex justify-content-between align-items-end p-0 mb-3">
+				    <!-- 카테고리 선택 -->
+				    <div class="me-3 flex-shrink-0" style="width: 220px;">
+				        <select id="categorySelect" name="category" class="category-select" onChange="search(event)">
+				            <option value="0">전체</option>
+				            <th:block th:each="category : ${categoryList}">
+				                <option th:value="${category.id}" th:text="${category.name}" th:selected="${category.id == clubDTO.category}"></option>
+				            </th:block>
+				        </select>
+				    </div>
+					<!--동아리 생성 버튼-->
+					<div class="ms-3">
+					    <a href="/club/create" class="btn btn-primary-custom d-flex align-items-center">
+					        <i class="bi bi-pencil-square me-2"></i> 동아리 생성
+					    </a>
+					</div>
+				</div>
+                <div class="filter-box rounded-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-lg-10 col-md-9">
+                            <label for="keyword" class="form-label">검색어</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" name="keyword" id="keyword" th:value="${keyword}"
+                                       placeholder="동아리명, 활동 내용 검색..." class="form-control">
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-2 col-md-3">
+                            <button type="submit" class="btn btn-search btn-lg w-100">
+                                <i class="bi bi-search me-2"></i>검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div id="gatheringsGrid">
+                <div th:if="${#lists.isEmpty(clubs)}" class="text-center py-5">
+                    <div class="text-secondary opacity-50 mb-3">
+                        <i class="fa-regular fa-folder-open fa-3x"></i>
+                    </div>
+                    <p class="fs-5 text-secondary">표시할 동아리가 없습니다.</p>
+                </div>
+
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+                    <div class="col" th:each="club : ${clubs}">
+                        <a th:href="@{/club/{id}(id=${club.id})}" class="card h-100 club-card text-decoration-none shadow-sm">
+                            
+                            <div class="card-image-wrapper">
+                                <img th:if="${club.clubImg != null and !club.clubImg.isEmpty()}"
+                                     th:src="${club.clubImg}"
+                                     th:alt="${club.clubName}" class="card-image">
+                                <img th:unless="${club.clubImg != null and !club.clubImg.isEmpty()}"
+                                     src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=400"
+                                     th:alt="${club.clubName}" class="card-image">
+
+                                <span class="position-absolute top-0 start-0 m-3 badge bg-white text-primary fw-bold shadow-sm"
+                                      th:text="${club.cityName}"></span>
+                                <div class="card-overlay"></div>
+                            </div>
+
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-dark mb-2" th:text="${club.clubName}">동아리 이름</h5>
+                                
+                                <div class="text-muted small d-flex flex-column gap-1">
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa-solid fa-location-dot me-2 text-primary opacity-50" style="width:16px;"></i>
+                                        <span th:text="${club.provinceName}"></span>
+                                    </span>
+                                    <span class="d-flex align-items-center">
+                                        <i class="fa-solid fa-calendar-days me-2 text-primary opacity-50" style="width:16px;"></i>
+                                        <span th:text="${#temporals.format(club.createdAt, 'yyyy-MM-dd')}"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="card-footer bg-white border-top-0 pt-0 pb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">지금 참여해보세요!</span>
+                                    <span class="status-badge">모집중</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+				<!--페이징-->
+                <nav th:if="${pagingMap != null and pagingMap.searchCnt > 0}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${pagingMap.selectPageNo == 1} ? 'disabled'">
+                            <a class="page-link" th:if="${pagingMap.selectPageNo > 1}"
+                               th:href="@{/club(selectPageNo=${pagingMap.selectPageNo - 1}, keyword=${keyword}, category=${clubDTO.category})}" 
+                               aria-label="Previous">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        
+                        <li class="page-item" th:each="page : ${#numbers.sequence(pagingMap.beginPageNo, pagingMap.endPageNo)}" 
+                            th:classappend="${page == pagingMap.selectPageNo} ? 'active'">
+                            <a class="page-link" th:href="@{/club(selectPageNo=${page}, keyword=${keyword}, category=${clubDTO.category})}" 
+                               th:text="${page}">1</a>
+                        </li>
+                        
+                        <li class="page-item" th:classappend="${pagingMap.selectPageNo == pagingMap.pageAllCnt} ? 'disabled'">
+                            <a class="page-link" th:if="${pagingMap.selectPageNo < pagingMap.pageAllCnt}"
+                               th:href="@{/club(selectPageNo=${pagingMap.selectPageNo + 1}, keyword=${keyword}, category=${clubDTO.category})}" 
+                               aria-label="Next">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+	<script>
+	    function search(e) {
+	        const form = document.getElementById("filterForm");
+	        form.submit();
+	    }
+	</script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

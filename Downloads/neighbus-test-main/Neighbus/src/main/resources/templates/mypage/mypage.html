@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>마이페이지 - 동네친구</title>
+	<link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel='stylesheet'
+		href='https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-straight/css/uicons-regular-straight.css'>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<link rel="stylesheet" href="/css/navibar.css">
+	<link rel="stylesheet" href="/css/custom-modal.css">
+    <script src="/js/custom-modal.js"></script>
+	<link rel='stylesheet'
+		href='https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+
+	<style>
+		:root {
+			--primary: #A67C52;
+			--primary-dark: #8D6E63;
+			--primary-light: #C9A88A;
+			--accent-gold: #D4AF87;
+			--secondary: #F5DEB3;
+			--secondary-light: #F5E6D3;
+			--secondary-lighter: #FAF0E6;
+			--bg-ivory: #FFF8F0;
+			--bg-warm: #FFF5EB;
+			--bg-cream: #FAF0E6;
+			--card-bg: #FFFBF7;
+			--text-primary: #5D4037;
+			--text-secondary: #8D6E63;
+			--text-light: #A1887F;
+			--border-color: #E8D7C3;
+			--shadow-color: rgba(166, 124, 82, 0.15);
+			--shadow-hover: rgba(166, 124, 82, 0.25);
+			--white: #FFFFFF;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'SUIT', sans-serif;
+			background: linear-gradient(165deg, var(--bg-ivory) 0%, var(--bg-warm) 50%, var(--bg-cream) 100%);
+			color: var(--text-primary);
+			padding: 120px 20px 40px 20px;
+			min-height: 100vh;
+		}
+
+		/* Page Container */
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			display: grid;
+			grid-template-columns: 320px 1fr;
+			gap: 30px;
+		}
+
+		/* Profile Card */
+		.profile-card {
+			background-color: var(--card-bg);
+			border: none;
+			border-radius: 24px;
+			box-shadow:
+				0 2px 8px rgba(166, 124, 82, 0.08),
+				0 4px 16px rgba(166, 124, 82, 0.06),
+				0 0 0 1px rgba(166, 124, 82, 0.04);
+			padding: 30px;
+			text-align: center;
+			height: fit-content;
+			transition: all 0.3s ease;
+		}
+
+		.profile-card:hover {
+			box-shadow:
+				0 4px 12px rgba(166, 124, 82, 0.12),
+				0 8px 24px rgba(166, 124, 82, 0.08),
+				0 0 0 1px rgba(166, 124, 82, 0.06);
+			transform: translateY(-2px);
+		}
+
+		.profile-image-wrapper {
+			position: relative;
+			width: 140px;
+			height: 140px;
+			margin: 0 auto 20px;
+			cursor: pointer;
+		}
+
+		.profile-image {
+			width: 140px;
+			height: 140px;
+			border-radius: 50%;
+			object-fit: cover;
+			border: 6px solid var(--secondary-lighter);
+			box-shadow: 0 4px 12px rgba(166, 124, 82, 0.15);
+			transition: opacity 0.3s ease;
+		}
+
+		.profile-image-wrapper:hover .profile-image {
+			opacity: 0.7;
+		}
+
+		.profile-image-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			border-radius: 50%;
+			background: rgba(0, 0, 0, 0.5);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.profile-image-wrapper:hover .profile-image-overlay {
+			opacity: 1;
+		}
+
+		.profile-image-overlay i {
+			color: white;
+			font-size: 40px;
+		}
+
+		.profile-name {
+			font-size: 24px;
+			font-weight: 700;
+			margin-bottom: 8px;
+		}
+
+		.profile-nickname {
+			font-size: 17px;
+			font-weight: 600;
+			color: var(--text-secondary);
+			margin-bottom: 8px;
+		}
+
+		.profile-email {
+			font-size: 15px;
+			color: var(--text-secondary);
+			margin-bottom: 25px;
+		}
+
+		.profile-stats {
+			display: flex;
+			justify-content: space-around;
+			margin-bottom: 25px;
+			padding: 20px 0;
+			border-top: 1px solid var(--border-color);
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		.stat-item {
+			font-size: 18px;
+			font-weight: 600;
+			color: var(--text-primary);
+		}
+
+		.stat-item span {
+			display: block;
+			font-size: 13px;
+			font-weight: 500;
+			color: var(--text-secondary);
+			margin-top: 6px;
+		}
+
+		.stat-item span:first-child {
+			display: block;
+			font-size: 18px;
+			font-weight: 600;
+			color: var(--text-primary);
+			margin-top: 0;
+			margin-bottom: 6px;
+		}
+
+		.stat-item span:last-child {
+			font-size: 13px;
+			font-weight: 500;
+			color: var(--text-secondary);
+		}
+
+		.profile-actions .btn {
+			display: block;
+			width: 100%;
+			padding: 15px;
+			margin-bottom: 12px;
+			border: none;
+			border-radius: 12px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			text-decoration: none;
+			box-shadow: 0 2px 8px rgba(166, 124, 82, 0.1);
+		}
+
+		.profile-actions .btn-primary {
+			background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+			color: white;
+		}
+
+		.profile-actions .btn-primary:hover {
+			transform: translateY(-3px);
+			background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+			box-shadow: 0 6px 20px rgba(166, 124, 82, 0.25);
+			color: white;
+		}
+
+		.profile-actions .btn-secondary {
+			background: var(--white);
+			color: var(--text-primary);
+			border: 2px solid var(--border-color);
+		}
+
+		.profile-actions .btn-secondary:hover {
+			background: var(--secondary-lighter);
+			border-color: var(--primary);
+			color: var(--primary);
+			transform: translateY(-2px);
+		}
+
+		.profile-actions .btn-danger {
+			background: linear-gradient(135deg, #C87E7E 0%, #B36A6A 100%);
+			color: white;
+		}
+
+		.profile-actions .btn-danger:hover {
+			background: linear-gradient(135deg, #B36A6A 0%, #C87E7E 100%);
+			transform: translateY(-3px);
+			box-shadow: 0 6px 20px rgba(200, 126, 126, 0.25);
+		}
+
+		/* Main Content */
+		.main-content {
+			background-color: var(--card-bg);
+			border: none;
+			border-radius: 24px;
+			box-shadow:
+				0 2px 8px rgba(166, 124, 82, 0.08),
+				0 4px 16px rgba(166, 124, 82, 0.06),
+				0 0 0 1px rgba(166, 124, 82, 0.04);
+			padding: 30px;
+			transition: all 0.3s ease;
+		}
+
+		.main-content:hover {
+			box-shadow:
+				0 4px 12px rgba(166, 124, 82, 0.12),
+				0 8px 24px rgba(166, 124, 82, 0.08),
+				0 0 0 1px rgba(166, 124, 82, 0.06);
+		}
+
+		.tabs {
+			display: flex;
+			border-bottom: 1px solid var(--border-color);
+			margin-bottom: 30px;
+		}
+
+		.tab-link {
+			padding: 15px 25px;
+			cursor: pointer;
+			font-size: 16px;
+			font-weight: 600;
+			color: var(--text-secondary);
+			border-bottom: 3px solid transparent;
+			transition: all 0.3s ease;
+			margin-bottom: -2px;
+		}
+
+		.tab-link.active {
+			color: var(--primary);
+			border-bottom-color: var(--primary);
+		}
+
+		.tab-content {
+			display: none;
+		}
+
+		.tab-content.active {
+			display: block;
+			animation: fadeIn 0.5s ease;
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(10px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.section-title {
+			font-size: 22px;
+			font-weight: 700;
+			margin-bottom: 25px;
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.section-title i {
+			color: var(--primary);
+		}
+
+		/* Info Section */
+		.info-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+			gap: 25px;
+		}
+
+		.info-item {
+			background: linear-gradient(135deg, var(--white) 0%, var(--bg-warm) 100%);
+			padding: 20px;
+			border-radius: 16px;
+			border: 1px solid var(--border-color);
+			transition: all 0.3s ease;
+			box-shadow: 0 2px 6px rgba(166, 124, 82, 0.06);
+		}
+
+		.info-item:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(166, 124, 82, 0.12);
+			border-color: var(--primary-light);
+		}
+
+		.info-label {
+			font-size: 13px;
+			color: var(--text-secondary);
+			margin-bottom: 8px;
+			font-weight: 500;
+		}
+
+		.info-value {
+			font-size: 16px;
+			font-weight: 600;
+		}
+
+		/* Activity Section */
+		.activity-list .activity-item {
+			display: flex;
+			align-items: center;
+			padding: 20px;
+			min-height: 90px;
+			max-height: 90px;
+			border-radius: 16px;
+			transition: all 0.3s ease;
+			cursor: pointer;
+		}
+
+		.activity-list .activity-item:hover {
+			background: linear-gradient(135deg, var(--bg-warm) 0%, var(--secondary-lighter) 100%);
+			transform: translateX(5px);
+			box-shadow: 0 2px 8px rgba(166, 124, 82, 0.08);
+		}
+
+		.activity-list .activity-item:not(:last-child) {
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		.activity-icon {
+			font-size: 20px;
+			color: var(--primary);
+			margin-right: 20px;
+			width: 40px;
+			height: 40px;
+			display: grid;
+			place-items: center;
+			background: linear-gradient(135deg, var(--secondary-light) 0%, var(--secondary-lighter) 100%);
+			border-radius: 50%;
+			box-shadow: 0 2px 6px rgba(166, 124, 82, 0.12);
+		}
+
+		.activity-content .title {
+			font-weight: 600;
+			margin-bottom: 6px;
+		}
+
+		.activity-content .meta {
+			font-size: 13px;
+			color: var(--text-secondary);
+		}
+
+		.activity-details {
+			margin-left: auto;
+			text-align: right;
+		}
+
+		.activity-details .badge {
+			background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+			color: white;
+			font-size: 12px;
+			font-weight: 600;
+			padding: 6px 12px;
+			border-radius: 20px;
+			box-shadow: 0 2px 6px rgba(166, 124, 82, 0.15);
+		}
+
+		.activity-details .time {
+			font-size: 13px;
+			color: var(--text-secondary);
+			margin-top: 8px;
+		}
+
+		/* 반응형 */
+		@media (max-width: 992px) {
+			.container {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		@media (max-width: 768px) {
+			body {
+				padding: 100px 15px 40px 15px;
+			}
+
+			.profile-image {
+				width: 120px;
+			height: 120px;
+			}
+
+			.tabs {
+				justify-content: space-around;
+			}
+
+			.tab-link {
+				padding: 12px 10px;
+				font-size: 15px;
+				flex-grow: 1;
+				text-align: center;
+			}
+
+			.info-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		/* [수정됨] 사용자 정의 모달 스타일 - .modal 대신 #editModal ID 선택자 사용 */
+		/* 부트스트랩 기본 .modal 클래스와 충돌 방지 */
+		#editModal {
+			display: none;
+			position: fixed;
+			z-index: 2000;
+			/* 부트스트랩 모달보다 높게 설정 */
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.5);
+			animation: fadeIn 0.3s ease;
+		}
+
+		#editModal.show {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		/* [수정됨] .modal-content 대신 #editModal .modal-content 사용 */
+		#editModal .modal-content {
+			background-color: var(--card-bg);
+			border-radius: 24px;
+			padding: 40px;
+			max-width: 500px;
+			width: 90%;
+			box-shadow:
+				0 8px 32px rgba(166, 124, 82, 0.2),
+				0 16px 64px rgba(166, 124, 82, 0.15);
+			animation: slideUp 0.3s ease;
+		}
+
+		@keyframes slideUp {
+			from {
+				opacity: 0;
+				transform: translateY(50px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.modal-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 30px;
+		}
+
+		.modal-header h3 {
+			font-size: 24px;
+			font-weight: 700;
+			color: var(--text-primary);
+		}
+
+		.close-btn {
+			background: none;
+			border: none;
+			font-size: 28px;
+			color: var(--text-secondary);
+			cursor: pointer;
+			transition: color 0.3s ease;
+		}
+
+		.close-btn:hover {
+			color: var(--text-primary);
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		.form-group label {
+			display: block;
+			font-size: 14px;
+			font-weight: 600;
+			color: var(--text-secondary);
+			margin-bottom: 8px;
+		}
+
+		.form-group input,
+		.form-group select {
+			width: 100%;
+			padding: 12px 16px;
+			border: 1px solid var(--border-color);
+			border-radius: 10px;
+			font-size: 15px;
+			font-family: 'Pretendard', sans-serif;
+			transition: all 0.3s ease;
+		}
+
+		.form-group input:focus,
+		.form-group select:focus {
+			outline: none;
+			border-color: var(--primary);
+			box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.15);
+		}
+
+		.form-group input:disabled {
+			background: linear-gradient(135deg, var(--secondary-lighter) 0%, var(--bg-warm) 100%);
+			color: var(--text-secondary);
+			cursor: not-allowed;
+		}
+
+		.region-select-group {
+			display: flex;
+			gap: 12px;
+		}
+
+		.region-select-group select {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.modal-actions {
+			display: flex;
+			gap: 12px;
+			margin-top: 30px;
+		}
+
+		.modal-actions button {
+			flex: 1;
+			padding: 14px;
+			border: none;
+			border-radius: 10px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		.modal-actions .btn-save {
+			background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+			color: white;
+		}
+
+		.modal-actions .btn-save:hover {
+			background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+			box-shadow: 0 4px 12px rgba(166, 124, 82, 0.25);
+			transform: translateY(-2px);
+		}
+
+		.modal-actions .btn-cancel {
+			background: var(--white);
+			color: var(--text-primary);
+			border: 2px solid var(--border-color);
+		}
+
+		.modal-actions .btn-cancel:hover {
+			background: var(--secondary-lighter);
+			border-color: var(--primary);
+			color: var(--primary);
+			transform: translateY(-2px);
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{include/navibar :: header-nav}"></div>
+
+	<div class="container">
+		<aside class="profile-card">
+			<div class="profile-image-wrapper" onclick="document.getElementById('profileImageInput').click()">
+				<img th:src="${myInfo.image}"
+					alt="프로필 이미지" class="profile-image">
+				<div class="profile-image-overlay">
+					<i class="fas fa-camera"></i>
+				</div>
+			</div>
+
+			<form id="profileImageForm" th:action="@{/mypage/uploadProfileImage}" method="post"
+				enctype="multipart/form-data" style="display: none;">
+				<input type="file" id="profileImageInput" name="profileImage"
+					accept="image/jpeg,image/jpg,image/png,image/jfif" onchange="confirmImageUpload(this)">
+			</form>
+
+			<div th:if="${successMessage}"
+				style="margin-top: 15px; padding: 12px 16px; background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); color: #065F46; border-radius: 12px; font-size: 14px; font-weight: 600; text-align: left; box-shadow: 0 2px 8px rgba(6, 95, 70, 0.1); border: 1px solid #6EE7B7;">
+				<i class="fas fa-check-circle"></i> [[${successMessage}]]
+			</div>
+
+			<div th:if="${errorMessage}"
+				style="margin-top: 15px; padding: 12px 16px; background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); color: #B91C1C; border-radius: 12px; font-size: 14px; font-weight: 600; text-align: left; box-shadow: 0 2px 8px rgba(185, 28, 28, 0.1); border: 1px solid #FCA5A5;">
+				<i class="fas fa-exclamation-triangle"></i> [[${errorMessage}]]
+			</div>
+
+			<h2 class="profile-name" th:text="${myInfo.name}"></h2>
+			<p class="profile-nickname" th:text="${myInfo.nickname}"></p>
+			<p class="profile-email" th:text="${myInfo.email}"></p>
+
+			<div class="profile-stats">
+				<div class="stat-item">
+					<span th:text="${myPosts.size()}"></span>
+					<span>게시글</span>
+				</div>
+				<div class="stat-item">
+					<span th:text="${myComments.size()}"></span>
+					<span>댓글</span>
+				</div>
+			</div>
+
+			<div class="profile-actions">
+				<button onclick="openEditModal()" class="btn btn-primary">프로필 수정</button>
+				<a class="btn btn-primary" href="/mypage/passwordUpdate">비밀번호 변경</a>
+				<form th:action="@{/logout}" method="post" style="margin: 0;">
+					<button type="submit" class="btn btn-secondary">로그아웃</button>
+				</form>
+				<form th:action="@{/mypage/delMyUser}" method="post" novalidate>
+					<button type="submit" class="btn btn-danger"
+						onclick="event.preventDefault(); showModal('confirm', '회원 탈퇴', '정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.', () => { this.closest('form').submit(); });">
+						회원 탈퇴
+					</button>
+				</form>
+			</div>
+		</aside>
+
+		<main class="main-content">
+			<div class="tabs">
+				<div class="tab-link active" onclick="openTab(event, 'my-info')">내 정보</div>
+				<div class="tab-link" onclick="openTab(event, 'my-posts')">내가 쓴 글</div>
+				<div class="tab-link" onclick="openTab(event, 'my-comments')">내가 쓴 댓글</div>
+				<div class="tab-link" onclick="openTab(event, 'my-clubs')">내 동아리</div>
+			</div>
+
+			<div id="my-info" class="tab-content active">
+				<h3 class="section-title"><i class="fas fa-user"></i>기본 정보</h3>
+				<div class="info-grid">
+					<div class="info-item">
+						<div class="info-label">이름</div>
+						<div class="info-value" th:text="${myInfo.name}"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">아이디</div>
+						<div class="info-value" th:text="${myInfo.username}"></div>
+					</div>
+										<div class="info-item">
+							<div class="info-label">생년월일</div>
+							<div class="info-value" th:text="${myInfo.birth != null and #strings.length(myInfo.birth) >= 6 ?
+																			#strings.substring(myInfo.birth,0,2) + '.' + 
+																			#strings.substring(myInfo.birth,2,4) + '.' +
+																		#strings.substring(myInfo.birth,4,6) : '정보 없음'}">
+							</div>
+						</div>
+					<div class="info-item">
+						<div class="info-label">지역</div>
+						<div class="info-value" th:text="${myInfo.city}"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">전화번호</div>
+						<div class="info-value d-flex justify-content-between align-items-center">
+							<span th:text="${#strings.substring(myInfo.phone,0,3) + '-' + 
+                                       #strings.substring(myInfo.phone,3,7) + '-' + 
+                                       #strings.substring(myInfo.phone,7,11)}">
+							</span>
+							<div th:if="${myInfo.grade == '인증 필요 유저'}">
+								<button onclick="startPhoneVerification()" 
+								    style="background-color: #A67C52; color: white; border: none; border-radius: 12px; padding: 12px 24px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(166, 124, 82, 0.3);"
+								    onmouseover="this.style.backgroundColor='#8D6E63'; this.style.transform='translateY(-2px)';"
+								    onmouseout="this.style.backgroundColor='#A67C52'; this.style.transform='translateY(0)';"
+								    class="btn">
+							    본인인증
+							</button>
+							</div>
+						</div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">닉네임</div>
+						<div class="info-value" th:text="${myInfo.nickname}"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">이메일</div>
+						<div class="info-value" th:text="${myInfo.email}">이메일</div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">등급</div>
+						<div class="info-value" th:text="${myInfo.grade}">등급</div>
+					</div>
+				</div>
+			</div>
+
+
+
+			<div id="my-posts" class="tab-content">
+				<h3 class="section-title"><i class="fas fa-pencil-alt"></i>최근 활동</h3>
+				<div class="activity-list overflow-y-auto overflow-x-hidden" style="max-height:500px;">
+					<a th:each="post : ${myPosts}"
+						th:href="@{${post.postType == 'gallery' ? '/gallery/detail/' + post.postId : '/freeboard/' + post.postId}}"
+						class="activity-item" style="text-decoration: none; color: inherit;">
+						<div class="activity-icon"><i class="fas fa-file-alt"></i></div>
+
+						<div class="activity-content">
+							<div class="title" th:text="${post.title}">게시글 제목이 여기에 표시됩니다</div>
+							<div class="meta">
+								<span th:text="${post.postType == 'gallery' ? '갤러리' : '자유게시판'}"></span>
+							</div>
+						</div>
+						<div class="activity-details">
+							<div class="time" th:text="${post.createdAt}">작성 시간</div>
+						</div>
+					</a>
+					<div th:if="${myPosts.isEmpty()}" style="padding: 20px; text-align: center;">
+						작성한 게시글이 없습니다.
+					</div>
+				</div>
+			</div>
+
+			<div id="my-comments" class="tab-content">
+				<h3 class="section-title"><i class="fas fa-comment"></i>내가 쓴 댓글</h3>
+				<div class="activity-list overflow-y-auto overflow-x-hidden" style="max-height:500px;">
+					<a th:each="comment : ${myComments}"
+						th:href="@{${comment.commentType == 'gallery' ? '/gallery/' + comment.postId : '/freeboard/' + comment.postId}}"
+						class="activity-item" style="text-decoration: none; color: inherit;">
+						<div class="activity-icon"><i class="fas fa-comment-dots"></i></div>
+
+						<div class="activity-content">
+							<div class="title" th:text="${comment.content}">댓글 내용이 여기에 표시됩니다</div>
+							<div class="meta">
+								<span th:text="${comment.commentType == 'gallery' ? '갤러리' : '자유게시판'}"></span>
+							</div>
+						</div>
+						<div class="activity-details">
+							<div class="time" th:text="${comment.createdAt}">작성 시간</div>
+						</div>
+					</a>
+					<div th:if="${myComments.isEmpty()}" style="padding: 20px; text-align: center;">
+						작성한 댓글이 없습니다.
+					</div>
+				</div>
+			</div>
+
+			<div id="my-clubs" class="tab-content">
+				<h3 class="section-title"><i class="fi fi-rr-users-alt"></i>내 동아리</h3>
+				<div class="activity-list overflow-y-auto overflow-x-hidden" style="max-height:500px;">
+					<th:block th:each="club : ${myClubs}">
+						<a class="activity-item" th:href="@{|/club/${club.id}|}"
+							style="text-decoration: none; color: inherit;">
+
+							<div class="flex-shrink-0"
+								style="width: 90px; height: 90px; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+								<img th:src="${club.clubImg}" class="img-fluid rounded" alt="동아리 이미지">
+
+							</div>
+
+							<div class="flex-grow-1 d-flex flex-column justify-content-between"
+								style="height: 90px; padding: 20px;">
+								<div class="fw-bold" th:text="${club.clubName}">동아리 이름</div>
+								<div class="text-secondary small" th:text="${club.clubInfo}">동아리 설명</div>
+							</div>
+						</a>
+
+
+					</th:block>
+					<div th:if="${myClubs.isEmpty()}" style="padding: 20px; text-align: center;">
+						가입한 동아리가 없습니다.
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+
+	<div id="editModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3><i class="fas fa-user-edit"></i> 프로필 수정</h3>
+				<button class="close-btn" onclick="closeEditModal()">&times;</button>
+			</div>
+			<form th:action="@{/mypage/update}" method="post">
+				<div class="form-group">
+					<label>이름</label>
+					<input type="text" th:value="${myInfo.name}" disabled>
+				</div>
+				<div class="form-group">
+					<label>아이디</label>
+					<input type="text" th:value="${myInfo.username}" disabled>
+				</div>
+				<div class="form-group">
+					<label>생년월일</label>
+					<input type="text"
+						th:value="${myInfo.birth != null and #strings.length(myInfo.birth) >= 6 ?
+                                       #strings.substring(myInfo.birth,0,2) + '.' +
+                                       #strings.substring(myInfo.birth,2,4) + '.' +
+                                       #strings.substring(myInfo.birth,4,6) : '정보 없음'}"
+						disabled>
+				</div>
+				<div class="form-group">
+					<label>전화번호</label>
+					<input type="text"
+						th:value="${#strings.substring(myInfo.phone,0,3) + '-' + #strings.substring(myInfo.phone,3,7) + '-' + #strings.substring(myInfo.phone,7,11)}"
+						disabled>
+				</div>
+				<div class="form-group">
+					<label>닉네임</label>
+					<input type="text" name="nickname" th:value="${myInfo.nickname}" required>
+				</div>
+				<div class="form-group">
+					<label>지역</label>
+					<div class="region-select-group">
+						<select id="provinceSelect" name="province" required>
+							<option value="" disabled selected>시/도 선택</option>
+							<option th:each="province : ${provinceList}" th:value="${province.id}"
+								th:text="${province.province}"></option>
+						</select>
+						<select id="citySelect" name="city" required disabled>
+							<option value="" disabled selected>시/군/구 선택</option>
+						</select>
+					</div>
+				</div>
+				<div class="modal-actions">
+					<button type="submit" class="btn-save">저장</button>
+					<button type="button" class="btn-cancel" onclick="closeEditModal()">취소</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		const currentCityName = /*[[${myInfo.city}]]*/ '';
+		const currentProvinceName = /*[[${myInfo.province}]]*/ '';
+		const regionList = /*[[${regionList}]]*/[];
+		/*]]>*/
+	</script>
+
+	<script>
+		// 프로필 이미지 업로드 확인
+		function confirmImageUpload(input) {
+			if (input.files && input.files[0]) {
+				const file = input.files[0];
+				const fileName = file.name;
+				const fileSize = (file.size / 1024 / 1024).toFixed(2); // MB로 변환
+
+                showModal('confirm', '프로필 사진 변경', `선택한 이미지: ${fileName} (${fileSize}MB)\n\n프로필 사진을 변경하시겠습니까?`, () => {
+                    document.getElementById('profileImageForm').submit();
+                }, () => {
+                    input.value = '';
+                });
+			}
+		}
+
+		// 모달 열기
+		function openEditModal() {
+			const modal = document.getElementById('editModal');
+			const provinceSelect = document.getElementById('provinceSelect');
+			const citySelect = document.getElementById('citySelect');
+
+			// 현재 사용자의 province와 city를 찾기
+			let currentProvinceId = null;
+			let currentCityId = null;
+
+			// regionList에서 현재 도시 이름으로 province와 city ID 찾기
+			for (let i = 0; i < regionList.length; i++) {
+				if (regionList[i].city === currentCityName) {
+					currentProvinceId = regionList[i].province;
+					currentCityId = regionList[i].id;
+					break;
+				}
+			}
+
+			// province 선택
+			if (currentProvinceId) {
+				provinceSelect.value = currentProvinceId;
+
+				// province가 선택되면 city 드롭다운 채우기
+				citySelect.innerHTML = '<option value="" disabled selected>시/군/구 선택</option>';
+				for (let i = 0; i < regionList.length; i++) {
+					if (currentProvinceId === regionList[i].province) {
+						const option = document.createElement('option');
+						option.value = regionList[i].id;
+						option.textContent = regionList[i].city;
+						citySelect.appendChild(option);
+					}
+				}
+				citySelect.disabled = false;
+
+				// city 선택
+			if (currentCityId) {
+				citySelect.value = currentCityId;
+			}
+			}
+
+			modal.classList.add('show');
+		}
+
+		// province 변경 이벤트 핸들러
+		const provinceSelect = document.getElementById('provinceSelect');
+		const citySelect = document.getElementById('citySelect');
+
+		provinceSelect.addEventListener('change', function () {
+			const selectedValue = parseInt(this.value, 10);
+			citySelect.innerHTML = '<option value="" disabled selected>시/군/구 선택</option>';
+
+			if (regionList && selectedValue) {
+				for (let i = 0; i < regionList.length; i++) {
+					if (selectedValue === regionList[i].province) {
+						const option = document.createElement('option');
+						option.value = regionList[i].id;
+						option.textContent = regionList[i].city;
+						citySelect.appendChild(option);
+					}
+				}
+				citySelect.disabled = false;
+			} else {
+				citySelect.disabled = true;
+			}
+		});
+
+		// 모달 닫기
+		function closeEditModal() {
+			const modal = document.getElementById('editModal');
+			modal.classList.remove('show');
+		}
+
+		// 모달 외부 클릭 시 닫기
+		window.onclick = function (event) {
+			const modal = document.getElementById('editModal');
+			if (event.target === modal) {
+				closeEditModal();
+			}
+		}
+
+		function openTab(evt, tabName) {
+			var i, tabcontent, tablinks;
+			// 모든 탭 컨텐츠 숨기기
+			tabcontent = document.getElementsByClassName("tab-content");
+			for (i = 0; i < tabcontent.length; i++) {
+				tabcontent[i].classList.remove("active");
+			}
+			// 모든 탭 링크에서 'active' 클래스 제거
+			tablinks = document.getElementsByClassName("tab-link");
+			for (i = 0; i < tablinks.length; i++) {
+				tablinks[i].classList.remove("active");
+			}
+			// 클릭된 탭 컨텐츠 보이기 및 'active' 클래스 추가
+			document.getElementById(tabName).classList.add("active");
+			evt.currentTarget.classList.add("active");
+		}
+
+		// 페이지 로드 시 기본으로 '내 정보' 탭 활성화
+		document.addEventListener("DOMContentLoaded", function () {
+			const defaultTabLink = document.querySelector('.tab-link[onclick*="my-info"]');
+
+			if (defaultTabLink) {
+				openTab({currentTarget: defaultTabLink}, 'my-info');
+			}
+		});
+	</script>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		function startPhoneVerification() {
+            showModal('confirm', '본인 인증', '본인인증을 진행하시겠습니까? 인증이 완료되면 등급이 조정됩니다.', () => {
+                fetch('/account/phoneVerification', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+				})
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+					return response.json();
+				})
+				.then(data => {
+					if (data.status === 1) {
+	                    showModal('prompt', '인증번호 입력', '인증번호를 입력하세요.', (userCode) => {
+	                        if (userCode == data.code) {
+								showModal('success', '인증 성공', '인증에 성공했습니다. 페이지를 새로고침합니다.', () => {
+	                                updateGrade();
+	                            });
+							}
+	                        else {
+								showModal('error', '인증 실패', '인증번호가 일치하지 않습니다.');
+							}
+	                    });
+					}
+	                else {
+						showModal('error', '전송 실패', '인증번호 전송에 실패했습니다. 이미 가입된 번호인지 확인하세요.');
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					showModal('error', '오류', '알 수 없는 오류가 발생했습니다.');
+				});
+            });
+		}
+		
+		function updateGrade(){
+		    // 새로운 form 엘리먼트 생성
+		    var form = document.createElement("form");
+		    form.method = "POST";
+		    form.action = "/account/updateGrade";
+
+		    // 새로운 input 엘리먼트 생성
+		    var input = document.createElement("input");
+		    input.type = "hidden";
+		    input.name = "id";
+		    input.value = "[[${myInfo.id}]]";
+
+		    // form에 input 추가하고 바로 body에 추가하여 submit
+		    form.appendChild(input);
+		    document.body.appendChild(form).submit();
+		}
+	</script>
+</body>
+
+</html>

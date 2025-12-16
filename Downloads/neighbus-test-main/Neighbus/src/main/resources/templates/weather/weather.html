@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘의 날씨</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/custom-modal.css">
+    <script src="/js/custom-modal.js"></script>
+    
+    <style>
+        body {
+            /* 배경: 산뜻한 파란 그라데이션 */
+            background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+        }
+        
+        /* 유리 효과 카드 디자인 */
+        .weather-card {
+            background: rgba(255, 255, 255, 0.25); /* 반투명 흰색 */
+            backdrop-filter: blur(10px);            /* 블러 효과 */
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            color: #333;
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .temp-text { font-size: 4rem; font-weight: 700; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .city-text { font-size: 1.5rem; color: #555; font-weight: bold; margin-bottom: 10px; }
+        .weather-icon { width: 100px; height: 100px; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); }
+        
+        .btn-custom {
+            background-color: rgba(255, 255, 255, 0.5);
+            border: none;
+            color: #333;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-custom:hover { background-color: rgba(255, 255, 255, 0.8); transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <div class="weather-card">
+        <div id="loading" class="spinner-border text-light my-5" role="status" style="display: none;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+
+        <div id="weatherContent" style="display: block;"> <h2 class="mb-4 text-white">🌤️ 오늘의 날씨</h2>
+            
+            <div id="resultArea" style="display: none;">
+                <img id="weatherIcon" src="" alt="날씨 아이콘" class="weather-icon">
+                <div id="cityName" class="city-text">도시 이름</div>
+                <div class="temp-text"><span id="temp">0</span>°</div>
+                <div id="desc" class="badge bg-light text-dark fs-5 mb-3">맑음</div>
+                
+                <div class="d-flex justify-content-center gap-3 text-white">
+                    <span>💧 습도 <span id="humidity">0</span>%</span>
+                </div>
+                <hr class="my-4 text-white">
+            </div>
+
+            <button class="btn btn-custom w-100 py-2" onclick="getLocation()">
+                📍 현재 위치 날씨 보기
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function getLocation() {
+            // 로딩 스피너 표시, 버튼 숨기기
+            document.getElementById("loading").style.display = "inline-block";
+            document.getElementById("resultArea").style.display = "none";
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(getWeatherByCoords, showError);
+            } else {
+                showModal('warning', '기능 미지원', '이 브라우저에서는 위치 정보 기능을 사용할 수 없습니다.');
+                resetUI();
+            }
+        }
+
+        function getWeatherByCoords(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            fetch(`/weather/current?lat=${lat}&lon=${lon}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 데이터 바인딩
+                    document.getElementById("cityName").innerText = data.city;
+                    document.getElementById("temp").innerText = Math.round(data.temp); // 소수점 반올림
+                    document.getElementById("desc").innerText = data.desc;
+                    document.getElementById("humidity").innerText = data.humidity;
+                    
+                    // ★ 아이콘 이미지 URL 설정
+                    const iconUrl = `https://openweathermap.org/img/wn/${data.icon}@4x.png`;
+                    document.getElementById("weatherIcon").src = iconUrl;
+
+                    // 화면 전환
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("resultArea").style.display = "block";
+                })
+                .catch(error => {
+                    showModal('error', '오류', '위치 정보를 가져오는 데 실패했습니다.');
+                    resetUI();
+                });
+        }
+
+        function showError() {
+            showModal('error', '접근 차단', '위치 정보 접근이 차단되었습니다. 브라우저 설정을 확인해주세요.');
+            resetUI();
+        }
+
+        function resetUI() {
+            document.getElementById("loading").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>

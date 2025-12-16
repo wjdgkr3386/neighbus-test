@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모임 - 동네친구</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/navibar.css">
+    <style>
+        :root {
+            --primary-color: #F97316;
+            --primary-color-light: #FB923C;
+            --accent-color: #F97316;
+            --accent-color-hover: #EA580C;
+            --background-color: #F8FAFC;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+            --card-bg: #FFFFFF;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 800;
+        }
+        .page-header .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+        .filter-section {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: #FFF7ED;
+        }
+        .gatherings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        .activity-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+        .card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 20px;
+        }
+        .card-category {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #EEF2FF;
+            color: var(--primary-color);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        .card-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #F1F5F9;
+        }
+        .card-members {
+            font-size: 13px;
+            color: #94A3B8;
+            font-weight: 500;
+        }
+        .card-status {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .card-status.recruiting {
+            background: #DCFCE7;
+            color: #16A34A;
+        }
+        .card-status.deadline {
+            background: #FEF2F2;
+            color: #EF4444;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 40px 0;
+        }
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+        }
+        .page-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+	<div th:replace="~{include/navibar :: header-nav}"></div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>전체 모임</h1>
+            <p class="subtitle">우리 동네의 모든 모임을 둘러보세요.</p>
+        </div>
+
+        <div class="filter-section">
+            <button class="filter-btn" data-filter="all">전체</button>
+            <button class="filter-btn" data-filter="러닝">러닝/조깅</button>
+            <button class="filter-btn" data-filter="등산">등산</button>
+            <button class="filter-btn" data-filter="스터디">스터디</button>
+            <button class="filter-btn" data-filter="독서">독서</button>
+            <button class="filter-btn" data-filter="운동">운동</button>
+            <button class="filter-btn" data-filter="음악">음악</button>
+            <button class="filter-btn" data-filter="요리">요리</button>
+            <button class="filter-btn" data-filter="기타">기타</button>
+        </div>
+
+        <div class="gatherings-grid" id="gatheringsGrid">
+            <!-- Gathering cards will be injected by JavaScript -->
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- Pagination buttons will be injected by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const gatheringsData = [
+            { id: 1, category: '러닝', title: '주말 아침 한강 러닝크루', location: '서울 마포구 한강공원', time: '매주 토요일 오전 7시', members: [12, 20], status: 'recruiting', img: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=400' },
+            { id: 2, category: '스터디', title: '웹 개발 스터디 모임', location: '서울 강남구 스터디카페', time: '매주 수요일 오후 7시', members: [5, 6], status: 'deadline', img: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=400' },
+            { id: 3, category: '등산', title: '북한산 등산 동호회', location: '서울 강북구 북한산', time: '매주 일요일 오전 8시', members: [18, 25], status: 'recruiting', img: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400' },
+            { id: 4, category: '독서', title: '북클럽 - 함께 읽는 즐거움', location: '서울 용산구 카페', time: '매주 목요일 오후 7시', members: [8, 10], status: 'recruiting', img: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400' },
+            { id: 5, category: '요리', title: '주말 홈베이킹 클래스', location: '서울 성동구 쿠킹클래스', time: '매주 토요일 오후 2시', members: [4, 8], status: 'recruiting', img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400' },
+            { id: 6, category: '음악', title: '기타 동호회 세션', location: '서울 홍대 합주실', time: '매주 금요일 오후 8시', members: [6, 10], status: 'recruiting', img: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=400' },
+            { id: 7, category: '운동', title: '배드민턴 동호회', location: '서울 송파구 체육관', time: '매주 화요일 오후 7시', members: [10, 12], status: 'deadline', img: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400' },
+            { id: 8, category: '사진', title: '서울 사진 촬영 모임', location: '서울 전역', time: '매주 일요일 오후 2시', members: [7, 15], status: 'recruiting', img: 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=400' },
+            { id: 9, category: '요가', title: '힐링 요가 클래스', location: '서울 서초구 요가센터', time: '매주 월,수,금 오전 7시', members: [14, 20], status: 'recruiting', img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400' },
+            { id: 10, category: '보드게임', title: '보드게임 마니아 모임', location: '서울 강남구 보드게임카페', time: '매주 일요일 오후 3시', members: [6, 8], status: 'deadline', img: 'https://images.unsplash.com/photo-1606189933953-4d87e1b445c2?w=400' },
+            { id: 11, category: '기타', title: '반려동물 산책 모임', location: '서울 올림픽공원', time: '매주 주말', members: [5, 15], status: 'recruiting', img: 'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=400' }
+        ];
+
+        const grid = document.getElementById('gatheringsGrid');
+        const paginationContainer = document.getElementById('pagination');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+
+        let currentPage = 1;
+        const itemsPerPage = 9;
+        let currentFilter = 'all';
+
+        function getStatusText(status) {
+            return status === 'recruiting' ? '모집중' : '마감임박';
+        }
+
+        function displayItems(page, items) {
+            grid.innerHTML = '';
+            page--; // 0-indexed
+
+            const start = itemsPerPage * page;
+            const end = start + itemsPerPage;
+            const paginatedItems = items.slice(start, end);
+
+            for (const item of paginatedItems) {
+                const card = document.createElement('a');
+                card.href = `gathering-detail.html?id=${item.id}`;
+                card.className = 'activity-card';
+                card.innerHTML = `
+                    <img src="${item.img}" alt="${item.title}" class="card-image">
+                    <div class="card-content">
+                        <span class="card-category">${item.category}</span>
+                        <h3 class="card-title">${item.title}</h3>
+                        <div class="card-meta">
+                            <div class="card-meta-item">
+                                <i class="fa-solid fa-location-dot"></i> ${item.location}
+                            </div>
+                            <div class="card-meta-item">
+                                <i class="fa-solid fa-calendar-days"></i> ${item.time}
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <span class="card-members">${item.members[0]}/${item.members[1]}명</span>
+                            <span class="card-status ${item.status}">${getStatusText(item.status)}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        function setupPagination(items) {
+            paginationContainer.innerHTML = '';
+            const pageCount = Math.ceil(items.length / itemsPerPage);
+
+            for (let i = 1; i <= pageCount; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'page-btn';
+                btn.innerText = i;
+                if (i === currentPage) {
+                    btn.classList.add('active');
+                }
+                btn.addEventListener('click', function () {
+                    currentPage = i;
+                    filterAndDisplay();
+                });
+                paginationContainer.appendChild(btn);
+            }
+        }
+
+        function filterAndDisplay() {
+            let filteredItems = gatheringsData;
+
+            if (currentFilter !== 'all') {
+                filteredItems = gatheringsData.filter(item => item.category === currentFilter);
+            }
+
+            displayItems(currentPage, filteredItems);
+            setupPagination(filteredItems);
+        }
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                currentPage = 1;
+                filterAndDisplay();
+            });
+        });
+
+        // Check for URL params to set initial filter
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryFilter = urlParams.get('category');
+
+        if (categoryFilter) {
+            currentFilter = categoryFilter;
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === categoryFilter) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Initial display
+        filterAndDisplay();
+    });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

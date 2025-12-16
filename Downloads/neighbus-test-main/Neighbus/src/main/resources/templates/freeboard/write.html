@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 작성</title>
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
+    <link href="//fonts.googleapis.com/earlyaccess/nanumgothic.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary: #A67C52;
+            --primary-dark: #8D6E63;
+            --primary-light: #C9A88A;
+            --bg-ivory: #FFF8F0;
+            --bg-warm: #FFF5EB;
+            --bg-cream: #FAF0E6;
+            --card-bg: #FFFBF7;
+            --text-primary: #5D4037;
+            --text-secondary: #8D6E63;
+            --text-light: #A1887F;
+            --border-color: #E8D7C3;
+            --shadow-color: rgba(166, 124, 82, 0.15);
+            --white: #FFFFFF;
+            --accent-green: #7BA372;
+            --accent-red: #C87E7E;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            margin: 40px auto;
+            padding: 20px;
+            max-width: 900px;
+            width: 90%;
+            overflow-x: hidden;
+            font-family: 'SUIT', 'NanumSquare', -apple-system, sans-serif;
+            background: linear-gradient(165deg, var(--bg-ivory) 0%, var(--bg-warm) 50%, var(--bg-cream) 100%);
+            min-height: 100vh;
+        }
+
+        .contentForm {
+            background: var(--card-bg) !important;
+            border-radius: 24px;
+            box-shadow:
+                0 2px 8px rgba(166, 124, 82, 0.08),
+                0 4px 16px rgba(166, 124, 82, 0.06);
+            padding: 2.5rem !important;
+            border: 1px solid rgba(166, 124, 82, 0.08);
+        }
+
+        .savebar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .save {
+            font-size: 16px;
+            background: linear-gradient(135deg, var(--accent-green) 0%, #6B8E63 100%);
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            padding: 12px 24px;
+            margin: 0;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(123, 163, 114, 0.3);
+        }
+
+        .save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(123, 163, 114, 0.4);
+        }
+
+        #clubSelect {
+            width: 180px;
+            height: 50px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0 15px;
+            font-size: 15px;
+            margin-right: 10px;
+            appearance: none;
+            background-color: var(--white);
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A67C52' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        #clubSelect:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.1);
+        }
+
+        .title {
+            height: 50px;
+            flex: 1;
+            border-radius: 10px;
+            padding: 12px 18px;
+            box-sizing: border-box;
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            font-size: 18px;
+            outline: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .title:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.1);
+        }
+
+        .toolbar {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-cream) 100%);
+            padding: 20px !important;
+            box-shadow: 0 2px 12px rgba(166, 124, 82, 0.08);
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 6px;
+            padding: 6px;
+            background: var(--white);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 32px;
+            background: var(--border-color);
+            margin: 0 4px;
+        }
+
+        .toolbarHeader {
+            width: 100%;
+            min-height: 70px;
+            height: auto;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(to bottom, var(--card-bg) 0%, rgba(255, 251, 247, 0.98) 100%);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 20px !important;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(166, 124, 82, 0.12);
+            box-sizing: border-box;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tool {
+            height: 38px;
+            min-width: 38px;
+            font-size: 13px;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-radius: 8px;
+            padding: 0 12px;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--primary-light);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .tool:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+
+        .tool:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.25);
+        }
+
+        .tool i {
+            position: relative;
+            z-index: 1;
+            font-size: 14px;
+        }
+
+        .tool span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tool.icon-only {
+            min-width: 38px;
+            padding: 0;
+        }
+
+        .editor {
+            box-sizing: border-box;
+            width: 100%;
+            min-height: 500px;
+            padding: 20px;
+            font-size: 16px;
+            outline: none;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--white);
+            color: var(--text-primary);
+            line-height: 1.7;
+            transition: all 0.2s ease;
+        }
+
+        .editor:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.1);
+        }
+
+        .editor:empty:before {
+            content: attr(placeholder);
+            color: var(--text-light);
+        }
+
+        .editor img {
+            max-width: 100%;
+            display: block;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        select.tool {
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            padding: 0 10px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            height: 36px;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235D4037' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 12px;
+            padding-right: 28px;
+        }
+
+        .bottomSavebar {
+            height: 60px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+            margin-bottom: 0;
+        }
+
+        .bottomCancel {
+            height: 55px;
+            width: 48%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-cream);
+            color: var(--text-primary);
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .bottomCancel:hover {
+            background: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(166, 124, 82, 0.2);
+        }
+
+        .bottomSave {
+            height: 55px;
+            width: 48%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--accent-green) 0%, #6B8E63 100%);
+            color: var(--white);
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(123, 163, 114, 0.3);
+        }
+
+        .bottomSave:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(123, 163, 114, 0.4);
+        }
+
+        .fa-xmark {
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .fa-xmark:hover {
+            color: var(--accent-red);
+            transform: scale(1.1);
+        }
+
+		/* 커스텀 모달 스타일 */
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(93, 64, 55, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .custom-modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .custom-modal {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px 35px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(166, 124, 82, 0.3);
+            animation: slideUp 0.3s ease;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .modal-icon.success {
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            color: var(--accent-green);
+        }
+
+        .modal-icon.error {
+            background: linear-gradient(135deg, #FFE8EC 0%, #FFD6DC 100%);
+            color: var(--accent-red);
+        }
+
+        .modal-icon.warning {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+            color: #F57C00;
+        }
+
+        .modal-icon.confirm {
+            background: linear-gradient(135deg, var(--bg-cream) 0%, var(--border-color) 100%);
+            color: var(--primary);
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .modal-message {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 100px;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #6B8E63 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(123, 163, 114, 0.3);
+        }
+
+        .modal-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(123, 163, 114, 0.4);
+        }
+
+        .modal-btn.secondary {
+            background: var(--bg-cream);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .modal-btn.secondary:hover {
+            background: var(--border-color);
+            transform: translateY(-2px);
+        }
+
+    </style>
+    <script th:inline="javascript">
+        let savedRange;
+        let editor;
+
+        // 커스텀 모달 함수
+        function showModal(type, title, message, callback) {
+            const overlay = document.getElementById('customModalOverlay');
+            const icon = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const messageEl = document.getElementById('modalMessage');
+            const buttons = document.getElementById('modalButtons');
+
+            // 아이콘 설정
+            icon.className = 'modal-icon ' + type;
+            const icons = {
+                'success': '✓',
+                'error': '✕',
+                'warning': '!',
+                'confirm': '?'
+            };
+            icon.textContent = icons[type] || '✓';
+
+            // 제목과 메시지 설정
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            // 버튼 설정
+            if (type === 'confirm') {
+                buttons.innerHTML = `
+                    <button class="modal-btn secondary" onclick="closeModal()">취소</button>
+                    <button class="modal-btn primary" onclick="confirmAction()">확인</button>
+                `;
+                window.confirmCallback = callback;
+            } else {
+                buttons.innerHTML = `
+                    <button class="modal-btn primary" onclick="closeModal(${callback ? 'true' : ''})">확인</button>
+                `;
+                if (callback) {
+                    window.modalCallback = callback;
+                }
+            }
+
+            overlay.classList.add('active');
+        }
+
+        function closeModal(executeCallback) {
+            const overlay = document.getElementById('customModalOverlay');
+            overlay.classList.remove('active');
+            if (executeCallback && window.modalCallback) {
+                window.modalCallback();
+                window.modalCallback = null;
+            }
+        }
+
+        function confirmAction() {
+            closeModal();
+            if (window.confirmCallback) {
+                window.confirmCallback();
+                window.confirmCallback = null;
+            }
+        }
+
+        function ajax(url, method, formElement, callback) {
+            const formData = new FormData(formElement);
+            formData.set('content', document.querySelector('.editor').innerHTML);
+
+            fetch(url, {
+                method: method.toUpperCase(),
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const cnt = parseInt(data);
+                callback(isNaN(cnt) ? 0 : cnt);
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                callback(0);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        
+        function init(){
+            editor = document.querySelector('.editor');
+            editor.focus();
+            
+            const range = document.createRange();
+            range.selectNodeContents(editor);
+            range.collapse(false);
+            savedRange = range.cloneRange();
+
+            const events = ['keyup', 'click', 'mouseup', 'focus', 'blur'];
+            events.forEach(evt => {
+                editor.addEventListener(evt, updateSavedRange);
+            });
+
+            editor.addEventListener('input', function () {
+                if (this.innerHTML.trim() === "<br>" || this.innerHTML.trim() === "<div><br></div>") {
+                    this.innerHTML = '';
+                }
+            });
+            
+            // 이미지 파일 첨부
+            document.getElementById('fileInput').addEventListener('change', function(event) {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const url = e.target.result;
+                        restoreSelection();
+
+                        const img = document.createElement('img');
+                        img.src = url;
+                        
+                        savedRange.deleteContents();
+                        savedRange.insertNode(img);
+                        
+                        savedRange.setStartAfter(img);
+                        savedRange.setEndAfter(img);
+                        savedRange.collapse(false);
+                        
+                        const selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(savedRange);
+
+
+						const br = document.createElement('br');
+						savedRange.insertNode(br);
+						
+savedRange.setEndAfter(br);
+						savedRange.collapse(false);
+						
+						selection = window.getSelection();
+			            selection.removeAllRanges();
+			            selection.addRange(savedRange);
+						
+                        document.getElementById('fileInput').value = ''; 
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.querySelector("input[name='title']").addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                }
+            });
+
+            window.addEventListener("scroll", function () {
+                let header = document.querySelector(".toolbarHeader");
+                let scrollY = window.scrollY;
+                if (scrollY > 200) { header.style.display = "flex"; } 
+                else { header.style.display = "none"; }
+            });
+
+            window.addEventListener("load", function () {
+                const [navigation] = performance.getEntriesByType("navigation");
+                if (navigation && navigation.type === "reload") {
+                    document.querySelector("[name='title']").value = '';
+                    document.querySelector(".editor").innerHTML = '';
+                    window.sessionStorage.removeItem("title");
+                    window.sessionStorage.removeItem("content");
+                }
+            });
+        }
+
+        function updateSavedRange() {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                if (editor.contains(range.commonAncestorContainer)) {
+                    savedRange = range.cloneRange();
+                }
+            }
+        }
+
+        function restoreSelection() {
+            editor.focus();
+            if (savedRange) {
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(savedRange);
+            } else {
+                const range = document.createRange();
+                range.selectNodeContents(editor);
+                range.collapse(false);
+                savedRange = range;
+            }
+        }
+
+        function inputHr(){
+            restoreSelection();
+            const hr = document.createElement('hr');
+            hr.style.display = 'block';
+            hr.style.border = 'none';
+            hr.style.borderTop = '2px solid #F2C9D4';
+
+            savedRange.deleteContents();
+            savedRange.insertNode(hr);
+            
+            savedRange.setStartAfter(hr);
+            savedRange.setEndAfter(hr);
+            savedRange.collapse(false);
+            
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(savedRange);
+        }
+
+        function execCommand(command, value = '') { execCommand(command, value); }
+
+        function preventFocusLoss(e) {
+            if (e.target.tagName === 'SELECT' || e.target.tagName === 'OPTION') {
+                return;
+            }
+            e.preventDefault();
+        }
+
+        function alignText(alignType) {
+            restoreSelection();
+            
+            document.execCommand(alignType, false, null);
+            
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                let container = range.commonAncestorContainer;
+                if (container.nodeType === 3) container = container.parentNode;
+
+                const allImages = editor.querySelectorAll('img');
+                allImages.forEach(img => {
+                    if (selection.containsNode(img, true)) {
+                        img.style.marginLeft = '';
+                        img.style.marginRight = '';
+
+                        if (alignType === 'justifyCenter') {
+                            img.style.marginLeft = 'auto';
+                            img.style.marginRight = 'auto';
+                        } else if (alignType === 'justifyRight') {
+                            img.style.marginLeft = 'auto';
+                            img.style.marginRight = '0';
+                        } else if (alignType === 'justifyLeft') {
+                            img.style.marginLeft = '0';
+                            img.style.marginRight = 'auto';
+                        }
+                    }
+                });
+            }
+            editor.focus();
+            updateSavedRange();
+        }
+
+        function fontStyle(font) { execCommand('fontName', font); }
+        function setFontSize(size) { execCommand('fontSize', size); }
+        function setFontColor(color) { execCommand('foreColor', color); }
+        function setBackgroundColor(color) { execCommand('backColor', color); }
+        
+        function uploadPost(){
+            const editorEl = document.querySelector(".editor");
+			const clubSelect = document.getElementById('clubSelect');
+            const titleInput = document.querySelector("[name='title']");
+            const content = editorEl.innerHTML;
+            const title = titleInput.value.trim();
+
+
+			if(clubSelect && clubSelect.value === '0'){
+				showModal('warning', '동아리 선택 필요', '동아리를 선택해주세요.', () => {
+					clubSelect.scrollIntoView({ behavior: 'smooth' });
+				});
+				return;
+			}
+            if(title===""){
+                showModal('warning', '제목 입력 필요', '제목을 입력해주세요.', () => {
+					titleInput.scrollIntoView({ behavior: 'smooth' });
+				});
+                return;
+            }else if(title.length > 25){
+                showModal('warning', '제목 길이 초과', '제목은 25글자 이하로 써주세요.', () => {
+					titleInput.scrollIntoView({ behavior: 'smooth' });
+				});
+                return;
+            }
+            if(content.trim()===""){
+                showModal('warning', '내용 입력 필요', '내용을 입력해주세요.', () => {
+					editorEl.scrollIntoView({ behavior: 'smooth' });
+				});
+                return;
+            }
+
+            const editorSize = new Blob([content]).size;
+            if (editorSize > 1024 * 1024 * 10) {
+                showModal('error', '용량 초과', '게시글 용량이 너무 큽니다.\n(이미지 포함 10MB 제한)');
+                return;
+            }
+
+            document.querySelector("[name='content']").value = content;
+
+            const idInput = document.querySelector("input[name='id']");
+            const id = idInput ? idInput.value : '';
+            const url = (id && id !== "0") ? "/freeboard/edit/" + id : "/freeboard/write";
+
+            var formObj = document.forms['contentForm'];
+            
+            ajax(
+                url,
+                "post",
+                formObj,
+                function (cnt) {
+                    if(Number(cnt) > 0){
+                        if(id && id !== "0") {
+                            showModal('success', '수정 완료', '게시글이 성공적으로 수정되었습니다.', () => {
+                                location.href = "/freeboard/" + id;
+                            });
+                        } else {
+                            showModal('success', '작성 완료', '게시글이 성공적으로 작성되었습니다.', () => {
+                                location.replace("/freeboard/list");
+                            });
+                        }
+                    } else {
+                        showModal('error', '실패', '게시글 저장에 실패했습니다.');
+                    }
+                }
+            );
+        }
+
+        function cancel(){
+            showModal('confirm', '작성 취소', '작성을 취소하시겠습니까?', () => {
+                location.href='/freeboard/list';
+            });
+        }
+    </script>
+</head>
+<body>
+<form class="contentForm bg-white p-3" name="contentForm">
+    <input type="hidden" name="id" th:value="${post != null ? post.id : 0}">
+
+    <div class="savebar">
+        <span>
+            <i class="fa-solid fa-xmark" style="font-size:25px; padding:20px; cursor:pointer;" onclick="cancel()"></i>
+        </span>
+        <span>
+            <input class="save save_btn" type="button" th:value="${post == null} ? '등록' : '수정'" onclick="uploadPost()">
+        </span>
+    </div>
+    <div style="width:100%; display:flex;">
+		<select th:if="${post == null}" id="clubSelect" name="clubId" required>
+		        <option value="0">동아리 선택</option>
+		    	<option th:each="club : ${myClubList}" 
+		                th:value="${club.id}" 
+		                th:text="${club.clubName}"
+						 > </option>
+		</select>
+		<input th:if="${post != null}" type="hidden" name="clubId" th:value="${post.clubId}">
+		<input type="text" name="title" class="title" placeholder="제목" th:value="${post != null ? post.title : ''}">
+    </div>
+    
+    <div class="toolbar p-3" onmousedown="preventFocusLoss(event)">
+        <div class="toolbar-group">
+            <button type="button" class="tool" title="이미지 삽입" onclick="document.getElementById('fileInput').click()"><i class="fa-regular fa-image"></i><span>이미지</span></button>
+            <input type="file" id="fileInput" name="image" style="display:none;" accept="image/*">
+            <button type="button" class="tool icon-only" title="수평선" onclick="inputHr()"><i class="fa-solid fa-minus"></i></button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-group">
+            <select class="tool" onchange="fontStyle(this.value)">
+                <option value="sans-serif">기본서체</option>
+                <option value="Malgun Gothic">맑은고딕</option>
+                <option value="Nanum Gothic">나눔고딕</option>
+                <option value="NanumSquare">나눔스퀘어</option>
+                <option value="Gulim">굴림체</option>
+                <option value="Dotum">돋움체</option>
+                <option value="Batang">바탕체</option>
+                <option value="Gungsuh">궁서체</option>
+            </select>
+            <select class="tool" onchange="setFontSize(this.value)">
+                <option value="1">10</option>
+                <option value="2">13</option>
+                <option value="3">16</option>
+                <option value="4" selected>18</option>
+                <option value="5">24</option>
+                <option value="6">32</option>
+                <option value="7">48</option>
+            </select>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-group">
+            <button type="button" class="tool" onclick="execCommand('bold')"><i class="fa-solid fa-bold"></i><span>굵게</span></button>
+            <button type="button" class="tool" onclick="execCommand('italic')"><i class="fa-solid fa-italic"></i><span>기울임</span></button>
+            <button type="button" class="tool" onclick="execCommand('underline')"><i class="fa-solid fa-underline"></i><span>밑줄</span></button>
+            <button type="button" class="tool" onclick="execCommand('strikeThrough')"><i class="fa-solid fa-strikethrough"></i><span>취소선</span></button>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-group">
+            <button type="button" class="tool icon-only" onclick="alignText('justifyLeft')"><i class="fa-solid fa-align-left"></i></button>
+            <button type="button" class="tool icon-only" onclick="alignText('justifyCenter')"><i class="fa-solid fa-align-center"></i></button>
+            <button type="button" class="tool icon-only" onclick="alignText('justifyRight')"><i class="fa-solid fa-align-right"></i></button>
+        </div>
+    </div>
+
+    <div class="editor" contenteditable="true" spellcheck="false" th:utext="${post != null ? post.content : ''}" placeholder="내용을 입력해주세요."></div>
+
+    <div class="bottomSavebar">
+        <span class="bottomCancel" onclick="cancel()">취소</span>
+        <span class="bottomSave" onclick="uploadPost()" th:text="${post == null} ? '저장' : '수정완료'"></span>
+    </div>
+
+    <input type="hidden" name="content">
+</form>
+
+<div class="toolbarHeader p-3" onmousedown="preventFocusLoss(event)">
+    <div class="toolbar-group">
+        <button type="button" class="tool" title="이미지 삽입" onclick="document.getElementById('fileInput').click()"><i class="fa-regular fa-image"></i><span>이미지</span></button>
+        <button type="button" class="tool icon-only" title="수평선" onclick="inputHr()"><i class="fa-solid fa-minus"></i></button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+        <select class="tool" onchange="fontStyle(this.value)">
+            <option value="sans-serif">기본서체</option>
+            <option value="Malgun Gothic">맑은고딕</option>
+            <option value="Nanum Gothic">나눔고딕</option>
+            <option value="NanumSquare">나눔스퀘어</option>
+        </select>
+        <select class="tool" onchange="setFontSize(this.value)">
+            <option value="3">16</option>
+            <option value="4">18</option>
+            <option value="5">24</option>
+        </select>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+        <button type="button" class="tool" onclick="execCommand('bold')"><i class="fa-solid fa-bold"></i><span>굵게</span></button>
+        <button type="button" class="tool" onclick="execCommand('italic')"><i class="fa-solid fa-italic"></i><span>기울임</span></button>
+        <button type="button" class="tool" onclick="execCommand('underline')"><i class="fa-solid fa-underline"></i><span>밑줄</span></button>
+        <button type="button" class="tool" onclick="execCommand('strikeThrough')"><i class="fa-solid fa-strikethrough"></i><span>취소선</span></button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+        <button type="button" class="tool icon-only" onclick="alignText('justifyLeft')"><i class="fa-solid fa-align-left"></i></button>
+        <button type="button" class="tool icon-only" onclick="alignText('justifyCenter')"><i class="fa-solid fa-align-center"></i></button>
+        <button type="button" class="tool icon-only" onclick="alignText('justifyRight')"><i class="fa-solid fa-align-right"></i></button>
+    </div>
+</div>
+
+<!-- 커스텀 모달 -->
+<div id="customModalOverlay" class="custom-modal-overlay" onclick="if(event.target === this) closeModal()">
+    <div class="custom-modal">
+        <div id="modalIcon" class="modal-icon success">✓</div>
+        <div id="modalTitle" class="modal-title">알림</div>
+        <div id="modalMessage" class="modal-message">메시지</div>
+        <div id="modalButtons" class="modal-buttons">
+            <button class="modal-btn primary" onclick="closeModal()">확인</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

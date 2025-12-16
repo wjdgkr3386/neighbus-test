@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>채팅방 목록</title>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="/css/custom-modal.css">
+    <script src="/js/custom-modal.js"></script>
+</head>
+<body>
+<div id="app">
+    <h3>채팅방 목록</h3>
+    <div>
+        <input type="text" v-model="room_name" @keyup.enter="createRoom">
+        <button @click="createRoom">방 만들기</button>
+    </div>
+    <ul>
+        <li v-for="item in chatrooms">
+            <button @click="enterRoom(item.roomId)">{{item.roomName}} (입장)</button>
+        </li>
+    </ul>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            room_name : '',
+            chatrooms: []
+        },
+        created() {
+            this.findAllRoom();
+        },
+        methods: {
+            findAllRoom: function() {
+                axios.get('/chat/rooms').then(response => { this.chatrooms = response.data; });
+            },
+            createRoom: function() {
+                if("" === this.room_name) {
+                    showModal('warning', '입력 필요', '방 이름을 입력해 주세요.');
+                    return;
+                }
+                var params = new URLSearchParams();
+                params.append("name", this.room_name);
+                
+                axios.post('/chat/room', params).then(response => {
+                    showModal('success', '개설 성공', response.data.roomName + "방 개설에 성공했습니다.");
+                    this.room_name = '';
+                    this.findAllRoom();
+                });
+            },
+            enterRoom: function(roomId) {
+                location.href="/chat/room/enter/"+roomId;
+            }
+        }
+    });
+</script>
+</body>
+</html>
