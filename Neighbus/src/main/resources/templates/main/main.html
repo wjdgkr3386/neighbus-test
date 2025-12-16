@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>NEIGHBUS - 함께 성장하는 커뮤니티</title>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<link rel="preconnect" href="https://cdn.jsdelivr.net">
+	<link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
+	<link rel="stylesheet" href="/css/navibar.css">
+	<link rel="stylesheet" href="/css/footer.css">
+
+	<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		:root {
+			--primary: #A67C52;
+			--primary-dark: #8D6E63;
+			--primary-light: #C9A88A;
+			--bg-ivory: #FFF8F0;
+			--bg-warm: #FFF5EB;
+			--bg-cream: #FAF0E6;
+			--card-bg: #FFFBF7;
+			--text-primary: #5D4037;
+			--text-secondary: #8D6E63;
+			--text-light: #A1887F;
+			--border-color: #E8D7C3;
+			--shadow-color: rgba(166, 124, 82, 0.1);
+			--shadow-hover: rgba(166, 124, 82, 0.2);
+			--white: #FFFFFF;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			font-family: 'SUIT', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+			color: var(--text-primary);
+			background: var(--bg-ivory);
+			line-height: 1.6;
+			overflow-x: hidden;
+			font-weight: 400;
+		}
+
+		/* Hero Section */
+		.hero {
+			min-height: 92vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: relative;
+			/* 중요: 내부 요소 배치를 위한 기준점 */
+			overflow: hidden;
+			background: linear-gradient(165deg, var(--bg-ivory) 0%, var(--bg-warm) 50%, var(--bg-cream) 100%);
+			padding: 5rem 0;
+		}
+
+		/* Particles.js 컨테이너 스타일 */
+		#particles-js {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			top: 0;
+			left: 0;
+			z-index: 1;
+			/* 배경으로 깔리도록 설정 */
+		}
+
+		.hero-content {
+			max-width: 1400px;
+			width: 100%;
+			padding: 0 4rem;
+			position: relative;
+			z-index: 2;
+			/* 입자보다 위에 오도록 설정 */
+			text-align: center;
+			pointer-events: none;
+			/* 클릭 이벤트를 통과시켜 뒤의 입자가 반응하게 하거나, 버튼 클릭을 위해 auto로 변경 */
+		}
+
+		/* 버튼 클릭을 위해 pointer-events 복구 */
+		.hero-content a {
+			pointer-events: auto;
+		}
+
+		.hero-title {
+			font-size: 6rem;
+			font-weight: 800;
+			line-height: 1.1;
+			letter-spacing: -0.03em;
+			margin-bottom: 2rem;
+			color: var(--text-primary);
+		}
+
+		.hero-description {
+			font-size: 1.4rem;
+			line-height: 1.7;
+			color: var(--text-secondary);
+			max-width: 600px;
+			margin: 0 auto 3rem;
+			font-weight: 400;
+		}
+
+		.btn-large {
+			padding: 1.2rem 3rem;
+			font-size: 1.05rem;
+			font-weight: 600;
+			border: 2px solid var(--primary);
+			background: var(--primary);
+			color: var(--white);
+			text-decoration: none;
+			display: inline-block;
+			transition: all 0.3s ease;
+			border-radius: 8px;
+		}
+
+		.btn-large:hover {
+			background: var(--primary-dark);
+			border-color: var(--primary-dark);
+			color: var(--white);
+			transform: translateY(-2px);
+		}
+
+		.scroll-down {
+			position: absolute;
+			bottom: 4rem;
+			left: 50%;
+			transform: translateX(-50%);
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: var(--text-light);
+			text-transform: uppercase;
+			letter-spacing: 0.15em;
+			z-index: 2;
+		}
+
+		.scroll-down::after {
+			content: '';
+			display: block;
+			width: 1px;
+			height: 40px;
+			background: var(--border-color);
+			margin: 1rem auto 0;
+			animation: scrollLine 2s ease-in-out infinite;
+		}
+
+		@keyframes scrollLine {
+
+			0%,
+			100% {
+				transform: translateY(0);
+				opacity: 0;
+			}
+
+			50% {
+				transform: translateY(20px);
+				opacity: 1;
+			}
+		}
+
+		/* 나머지 섹션 스타일은 유지 */
+		section {
+			padding: 2.5rem 0;
+		}
+
+		.section-primary-dark-bg {
+			background: var(--primary-dark);
+			color: var(--white);
+		}
+
+		.section-cream {
+			background: var(--bg-cream);
+		}
+
+		.container-custom {
+			max-width: 1400px;
+			margin: 0 auto;
+			padding: 0 4rem;
+		}
+
+		.section-header {
+			margin-bottom: 1.5rem;
+			text-align: center;
+		}
+
+		.section-label {
+			font-size: 2rem;
+			font-weight: 700;
+			letter-spacing: 0.2em;
+			text-transform: uppercase;
+			color: var(--primary);
+			margin-bottom: 0.5rem;
+		}
+
+		.section-primary-dark-bg .section-label {
+			color: var(--primary-light);
+		}
+
+		.section-title {
+			font-size: 1.5rem;
+			font-weight: 800;
+			line-height: 1.2;
+			letter-spacing: -0.03em;
+			margin-bottom: 0.5rem;
+			color: var(--text-primary);
+		}
+
+		.section-primary-dark-bg .section-title {
+			color: var(--white);
+		}
+
+		.section-description {
+			font-size: 2rem;
+			line-height: 1.6;
+			color: var(--text-secondary);
+			max-width: 700px;
+			font-weight: 400;
+			margin: 0 auto;
+		}
+
+		.section-primary-dark-bg .section-description {
+			color: var(--bg-cream);
+		}
+
+		/* Stats */
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1px;
+			margin-top: 3rem;
+			background: rgba(255, 255, 255, 0.1);
+		}
+
+		.stat-item {
+			padding: 3.5rem 2rem;
+			text-align: center;
+			transition: all 0.3s ease;
+			background: var(--primary-dark);
+		}
+
+		.stat-item:hover {
+			background: var(--text-primary);
+			transform: translateY(-5px);
+		}
+
+		.stat-number {
+			font-size: 4.5rem;
+			font-weight: 800;
+			line-height: 1;
+			margin-bottom: 1rem;
+			color: var(--white);
+		}
+
+		.stat-label {
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--primary-light);
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			margin-bottom: 0.5rem;
+		}
+
+		.stat-description {
+			font-size: 0.9rem;
+			color: var(--bg-cream);
+			line-height: 1.6;
+		}
+
+		/* Filter & Card Styles (Previous styles included) */
+		.filter-section {
+			padding: 1rem 0;
+		}
+
+		.filter-container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 1.5rem;
+			padding: 1rem 1.5rem;
+			background: var(--card-bg);
+			border: 1px solid var(--border-color);
+			border-radius: 8px;
+			box-shadow: 0 5px 15px var(--shadow-color);
+		}
+
+		.filter-label {
+			font-size: 0.85rem;
+			font-weight: 700;
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+			color: var(--text-primary);
+		}
+
+		.form-select-custom {
+			border: 1px solid var(--border-color);
+			padding: 0.5rem 0.8rem;
+			font-size: 0.85rem;
+			font-weight: 500;
+			background: var(--white);
+			min-width: 10%;
+			transition: all 0.2s ease;
+			border-radius: 6px;
+		}
+
+		.card-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 2rem;
+			margin-top: 2rem;
+		}
+
+		.card-item {
+			background: var(--card-bg);
+			border: 1px solid var(--border-color);
+			border-radius: 12px;
+			overflow: hidden;
+			transition: all 0.4s ease;
+			cursor: pointer;
+			position: relative;
+			box-shadow: 0 3px 12px var(--shadow-color);
+		}
+
+		.section-primary-dark-bg .card-item {
+			background: var(--primary-dark);
+			border-color: var(--primary);
+		}
+
+		.card-item:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 6px 18px var(--shadow-hover);
+		}
+
+		.card-image {
+			width: 100%;
+			height: 190px;
+			object-fit: cover;
+			transition: transform 0.4s ease;
+		}
+
+		.card-item:hover .card-image {
+			transform: scale(1.05);
+		}
+
+		.card-content {
+			padding: 1.5rem;
+		}
+
+		.card-title {
+			font-size: 1.15rem;
+			font-weight: 700;
+			line-height: 1.3;
+			margin-bottom: 0.7rem;
+			color: var(--text-primary);
+		}
+
+		.section-primary-dark-bg .card-title {
+			color: var(--white);
+		}
+
+		.card-meta {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			font-size: 0.85rem;
+			color: var(--text-light);
+			margin-bottom: 0.8rem;
+		}
+
+		.section-primary-dark-bg .card-meta {
+			color: var(--primary-light);
+		}
+
+		.card-meta i {
+			margin-right: 0.3rem;
+			color: var(--primary);
+		}
+
+		.section-primary-dark-bg .card-meta i {
+			color: var(--primary-light);
+		}
+
+		.card-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.4rem;
+			font-size: 0.8rem;
+			font-weight: 600;
+			color: var(--primary);
+			text-decoration: none;
+			margin-top: 0.5rem;
+			transition: gap 0.3s ease;
+		}
+
+		.section-primary-dark-bg .card-link {
+			color: var(--white);
+		}
+
+		.card-item:hover .card-link {
+			gap: 0.8rem;
+		}
+
+		.fade-in {
+			opacity: 0;
+			transform: translateY(40px);
+			transition: all 0.8s ease;
+		}
+
+		.fade-in.visible {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		.chatbot-btn {
+			position: fixed;
+			width: 60px;
+			height: 60px;
+			bottom: 30px;
+			right: 30px;
+			z-index: 1030;
+			font-size: 1.8rem;
+			transition: transform 0.3s ease;
+		}
+
+		.chatbot-btn:hover {
+			transform: scale(1.1);
+		}
+
+		.chat-widget-container {
+			position: fixed;
+			bottom: 30px;
+			right: 30px;
+			z-index: 1030;
+			display: flex;
+			align-items: flex-end;
+		}
+
+		.chat-window {
+			width: 370px;
+			height: 80vh;
+			max-height: 750px;
+			background-color: var(--card-bg);
+			border-radius: 16px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+			border: 1px solid var(--border-color);
+			display: none;
+			flex-direction: column;
+			margin-right: 20px;
+			opacity: 0;
+			transform: translateY(20px);
+			transition: opacity 0.3s ease, transform 0.3s ease;
+		}
+
+		.chat-window.show {
+			display: flex;
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		.chat-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.75rem 1.25rem;
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		.chat-title {
+			font-size: 1.1rem;
+			font-weight: 700;
+			color: var(--text-primary);
+			margin-bottom: 0;
+		}
+
+		.chat-body {
+			flex-grow: 1;
+			padding: 0;
+			overflow: hidden;
+		}
+
+		@media (max-width: 1200px) {
+			.hero-title {
+				font-size: 4.5rem;
+			}
+
+			.section-title {
+				font-size: 3rem;
+			}
+
+			.card-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			.stats-grid {
+				grid-template-columns: 1fr;
+				gap: 1px;
+			}
+		}
+
+		@media (max-width: 768px) {
+			.hero-title {
+				font-size: 3rem;
+			}
+
+			.card-grid {
+				grid-template-columns: 1fr;
+				gap: 2rem;
+			}
+
+			.footer-content {
+				flex-direction: column;
+				gap: 2rem;
+				text-align: center;
+			}
+		}
+	</style>
+
+</head>
+
+<body>
+
+	<div th:replace="~{include/navibar :: header-nav}"></div>
+
+	<section class="hero">
+		<div id="particles-js"></div>
+
+		<div class="hero-content">
+			<h1 class="hero-title fade-in">
+				함께 성장하는<br>
+				우리들의 커뮤니티
+			</h1>
+			<p class="hero-description fade-in">
+				관심사를 공유하고, 새로운 인연을 만들고, 함께 성장하는 공간.<br>
+				NEIGHBUS에서 당신만의 커뮤니티를 시작하세요.
+			</p>
+			<a href="#clubs" class="btn-large fade-in">모임 둘러보기</a>
+		</div>
+	</section>
+
+	<section class="section-primary-dark-bg">
+		<div class="container-custom">
+			<div class="section-header fade-in">
+				<div class="section-label">Why NEIGHBUS</div>
+				<p class="section-description">
+					단순한 모임을 넘어, 진정한 연결과 성장을 경험하세요.
+				</p>
+			</div>
+
+			<div class="stats-grid">
+				<div class="stat-item fade-in">
+					<div class="stat-number" th:text="${activeRecruitments}">0</div>
+					<div class="stat-label">Active Groups</div>
+					<p class="stat-description">현재 진행 중인<br>활발한 모임</p>
+				</div>
+				<div class="stat-item fade-in">
+					<div class="stat-number" th:text="${totalUsers}">0</div>
+					<div class="stat-label">Members</div>
+					<p class="stat-description">함께하고 있는<br>커뮤니티 멤버</p>
+				</div>
+				<div class="stat-item fade-in">
+					<div class="stat-number" th:text="${totalViews}">0</div>
+					<div class="stat-label">Visitors</div>
+					<p class="stat-description">경험한 사람들의<br>방문 기록</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="filter-section section-cream">
+		<div class="container-custom">
+			<form id="filterForm">
+				<div class="filter-container fade-in">
+					<span class="filter-label">Location</span>
+					<select class="form-select-custom" id="provinceSelect" name="province" required>
+					    <option value="0" selected>전체 지역</option>
+					    <option th:each="province : ${provinceList}" th:value="${province.id}" th:text="${province.province}" th:selected="${province.id == searchDTO.province}"></option>
+					</select>
+					<select class="form-select-custom" id="citySelect" onchange="search()" name="city">
+					    <option value="0" selected disabled>전체 시/군/구</option>
+					</select>
+					<div style="display:flex; width:20%;"></div>
+					<span class="filter-label">Category</span>
+					<select class="form-select-custom" id="categorySelect" name="category" onChange="search()">
+					    <option value="0">카테고리 전체</option>
+					    <option th:each="category : ${categoryList}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id == searchDTO.category}"></option>
+					</select>
+				</div>
+			</form>
+		</div>
+	</section>
+
+	<style>
+		/* Clubs Section Customizations */
+		#clubs {
+			min-height: 84vh;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+		}
+		.gathering-wrapper {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 2.5rem;
+			flex-grow: 1;
+			min-height: 0;
+		}
+		.gathering-section {
+			overflow-y: auto;
+			min-height: 0;
+			padding-right: 1rem;
+		}
+		#clubs .section-header {
+			text-align: left;
+			margin-bottom: 0.8rem;
+		}
+		#clubs .section-title {
+			font-size: 1.3rem;
+			line-height: 1.1;
+			margin-bottom: 0.4rem;
+		}
+		#clubs .card-grid {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 1.5rem;
+			margin-top: 0.6rem;
+		}
+		#clubs .card-image {
+			height: 200px;
+		}
+		#clubs .card-content {
+			padding: 1.5rem;
+		}
+		#clubs .card-title {
+			font-size: 1.1rem;
+			margin-bottom: 0.5rem;
+		}
+		#clubs .card-meta {
+			font-size: 0.8rem;
+			gap: 0.8rem;
+			margin-bottom: 0.6rem;
+		}
+	</style>
+	<section id="clubs" class="section-cream">
+		<div class="container-custom" style="display: flex; flex-direction: column; height: 100%;">
+			<div class="gathering-wrapper">
+				<div class="gathering-section overflow-hidden">
+					<div class="section-header fade-in">
+						<h2 class="section-title">인기 동아리</h2>
+					</div>
+					<div class="card-grid" id="popular-grid">
+						<th:block th:each="popularClub : ${popularClubList}">
+							<a th:href="@{/club/{id}(id=${popularClub.id})}" class="text-decoration-none">
+								<div class="card-item fade-in">
+									<img th:if="${popularClub.clubImg != null and !popularClub.clubImg.isEmpty()}"
+										th:src="${popularClub.clubImg}" class="card-image" alt="모임 이미지">
+									<img th:unless="${popularClub.clubImg != null and !popularClub.clubImg.isEmpty()}"
+										src="https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=1974&auto=format&fit=crop"
+										class="card-image" alt="기본 이미지">
+									<div class="card-content">
+										<h3 class="card-title" th:text="${popularClub.clubName}">모임 이름</h3>
+										<div class="card-meta">
+											<span>
+												<i class="bi bi-calendar-event"></i>
+												<span th:text="${#temporals.format(popularClub.created, 'yyyy.MM.dd')}">날짜</span>
+											</span>
+											<span>
+												<i class="bi bi-people-fill"></i>
+												<span th:text="${popularClub.memberCount}">0</span>명
+											</span>
+										</div>
+									</div>
+								</div>
+							</a>
+						</th:block>
+					</div>
+				</div>
+				<div class="gathering-section overflow-hidden">
+					<div class="section-header fade-in">
+						<h2 class="section-title">새로운 동아리</h2>
+					</div>
+					<div class="card-grid" id="new-grid">
+						<th:block th:each="newClub : ${newClubList}">
+							<a th:href="@{/club/{id}(id=${newClub.id})}" class="text-decoration-none">
+								<div class="card-item fade-in">
+									<img th:if="${newClub.clubImg != null and !newClub.clubImg.isEmpty()}"
+										th:src="${newClub.clubImg}" class="card-image" alt="모임 이미지">
+									<img th:unless="${newClub.clubImg != null and !newClub.clubImg.isEmpty()}"
+										src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1949&auto=format&fit=crop"
+										class="card-image" alt="기본 이미지">
+									<div class="card-content">
+										<h3 class="card-title" th:text="${newClub.clubName}">모임 이름</h3>
+										<div class="card-meta">
+											<span>
+												<i class="bi bi-calendar-event"></i>
+												<span th:text="${#temporals.format(newClub.created, 'yyyy.MM.dd')}">날짜</span>
+											</span>
+											<span>
+												<i class="bi bi-people-fill"></i>
+												<span th:text="${newClub.memberCount}">0</span>명
+											</span>
+										</div>
+									</div>
+								</div>
+							</a>
+						</th:block>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<div th:replace="~{include/footer :: footer}"></div>
+
+	<div class="chat-widget-container">
+		<div class="chat-window" id="chatWindow">
+			<div class="chat-header">
+				<h5 class="chat-title">Chat Assistant</h5>
+				<button type="button" class="btn-close" onclick="toggleChatWindow(event)"></button>
+			</div>
+			<div class="chat-body">
+				<iframe src="/chatbot/streamchat" style="width: 100%; height: 100%; border: none;"></iframe>
+			</div>
+		</div>
+		<a id="chatbot-btn"
+			class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center shadow-lg chatbot-btn"
+			onclick="toggleChatWindow(event)">
+			<i class="bi bi-chat-dots-fill"></i>
+		</a>
+	</div>
+
+<!--구글 로그인시 기본정보 재입력-->
+	<div sec:authorize="isAuthenticated()">
+	    <div th:if="${#authentication.principal.phone == '01000000000'}" class="modal fade" id="infoModal"
+	        data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+	        <div class="modal-dialog modal-dialog-centered">
+	            <div class="modal-content" style="border-radius: 24px; border: none; background-color: #FFFBF7; box-shadow: 0 10px 40px rgba(166, 124, 82, 0.3); overflow: hidden;">
+	                
+	                <div class="modal-header" style="background-color: #A67C52; color: white; border-bottom: none; padding: 1.5rem;">
+	                    <h5 class="modal-title" style="font-weight: 800; font-size: 1.2rem;">
+	                        <i class="bi bi-pencil-square me-2"></i>필수 정보 입력
+	                    </h5>
+	                </div>
+
+	                <div class="modal-body" style="padding: 2rem;">
+	                    <p style="text-align: center; color: #8D6E63; font-size: 0.9rem; margin-bottom: 1.5rem;">
+	                        원활한 서비스 이용을 위해<br>아래 정보를 입력해주세요.
+	                    </p>
+
+	                    <form th:action="@{/account/updateSocialInfo}" method="post">
+	                        <div class="mb-4">
+	                            <label class="form-label" style="color: #5D4037; font-weight: 700; font-size: 0.95rem;">핸드폰 번호</label>
+	                            <input type="text" name="phone" class="form-control" placeholder="(예: 01012345678)"
+	                                maxlength="11"
+	                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+	                                required
+	                                style="border: 2px solid #E8D7C3; border-radius: 12px; padding: 12px; background-color: white;">
+	                        </div>
+
+	                        <div class="mb-4">
+	                            <label class="form-label" style="color: #5D4037; font-weight: 700; font-size: 0.95rem;">생년월일</label>
+	                            <input type="text" name="birth" class="form-control" placeholder="(예: 980101)"
+	                                maxlength="6"
+	                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+	                                required
+	                                style="border: 2px solid #E8D7C3; border-radius: 12px; padding: 12px; background-color: white;">
+	                        </div>
+
+	                        <div class="mb-5">
+	                            <label class="form-label d-block" style="color: #5D4037; font-weight: 700; font-size: 0.95rem; margin-bottom: 10px;">성별</label>
+	                            <div style="background-color: #FFF5EB; padding: 15px; border-radius: 12px; border: 1px solid #E8D7C3; display: flex; gap: 20px;">
+	                                <div class="form-check form-check-inline">
+	                                    <input class="form-check-input" type="radio" name="sex" id="male" value="M" required style="cursor: pointer;">
+	                                    <label class="form-check-label" for="male" style="color: #5D4037; cursor: pointer;">남성</label>
+	                                </div>
+	                                <div class="form-check form-check-inline">
+	                                    <input class="form-check-input" type="radio" name="sex" id="female" value="F" style="cursor: pointer;">
+	                                    <label class="form-check-label" for="female" style="color: #5D4037; cursor: pointer;">여성</label>
+	                                </div>
+	                            </div>
+	                        </div>
+
+	                        <div class="d-grid">
+	                            <button type="submit" class="btn btn-primary" 
+	                                style="background-color: #A67C52; border: none; border-radius: 12px; padding: 14px; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 12px rgba(166, 124, 82, 0.3);">
+	                                저장하고 시작하기
+	                            </button>
+	                        </div>
+	                    </form>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+	<script>
+		// Particles.js Initialization
+		particlesJS('particles-js', {
+			"particles": {
+				"number": {
+					"value": 80,
+					"density": {
+						"enable": true,
+						"value_area": 800
+					}
+				},
+				"color": {
+					"value": "#A67C52" /* NEIGHBUS Primary Color로 입자 색상 변경 */
+				},
+				"shape": {
+					"type": "circle",
+					"stroke": {
+						"width": 0,
+						"color": "#000000"
+					}
+				},
+				"opacity": {
+					"value": 0.5,
+					"random": false
+				},
+				"size": {
+					"value": 3,
+					"random": true
+				},
+				"line_linked": {
+					"enable": true,
+					"distance": 150,
+					"color": "#A67C52", /* 연결선도 Primary Color로 변경 */
+					"opacity": 0.4,
+					"width": 1
+				},
+				"move": {
+					"enable": true,
+					"speed": 3,
+					"direction": "none",
+					"random": false,
+					"straight": false,
+					"out_mode": "out",
+					"bounce": false
+				}
+			},
+			"interactivity": {
+				"detect_on": "canvas",
+				"events": {
+					"onhover": {
+						"enable": true,
+						"mode": "grab"
+					},
+					"onclick": {
+						"enable": true,
+						"mode": "push"
+					},
+					"resize": true
+				},
+				"modes": {
+					"grab": {
+						"distance": 140,
+						"line_linked": {
+							"opacity": 1
+						}
+					}
+				}
+			},
+			"retina_detect": true
+		});
+
+		// Header Scroll Effect
+		window.addEventListener('scroll', function () {
+			const header = document.getElementById('header');
+			if (header) { // 헤더가 있을 때만 실행
+				if (window.scrollY > 100) {
+					header.classList.add('scrolled');
+				} else {
+					header.classList.remove('scrolled');
+				}
+			}
+		});
+
+		// Fade In Animation
+		const observerOptions = {
+			threshold: 0.1,
+			rootMargin: '0px 0px -100px 0px'
+		};
+
+		const observer = new IntersectionObserver(function (entries) {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					entry.target.classList.add('visible');
+				}
+			});
+		}, observerOptions);
+
+		document.querySelectorAll('.fade-in').forEach(el => {
+			observer.observe(el);
+		});
+
+		function toggleChatWindow(event) {
+			event.stopPropagation();
+			const chatWindow = document.getElementById('chatWindow');
+			const chatButton = document.getElementById('chatbot-btn');
+			const isOpening = !chatWindow.classList.contains('show');
+
+			chatWindow.classList.toggle('show');
+
+			if (isOpening) {
+				chatButton.innerHTML = '<i class="bi bi-x-lg"></i>'; // Change to close icon
+			} else {
+				chatButton.innerHTML = '<i class="bi bi-chat-dots-fill"></i>'; // Change back to chat icon
+			}
+		}
+	</script>
+
+	<script	th:if="${#authorization.expression('isAuthenticated()') and #authentication.principal.phone == '01000000000'}">
+        document.addEventListener('DOMContentLoaded', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('infoModal'));
+            myModal.show();
+        });
+    </script>
+		
+	<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notiModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="notiModalLabel">🔔 알림 목록</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<ul class="list-group list-group-flush" id="notificationList">
+					</ul>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script th:inline="javascript">
+		document.addEventListener("DOMContentLoaded", function(){
+		    const provinceSelect = document.getElementById('provinceSelect');
+		    const citySelect = document.getElementById('citySelect');
+		    const categorySelect = document.getElementById('categorySelect');
+		    
+		    // cityList는 Map<String, Object> 형태의 리스트 ([{id, city, province}, ...])
+		    const cityList = /*[[${regionList}]]*/ []; 
+			//기존에 선택되어있던 시/도 코드
+			const initialProvince = /*[[${searchDTO.province}]]*/ 0;
+			//기존에 선택되어있던 시/군/구 코드
+			const initialCity = /*[[${searchDTO.city}]]*/ 0;
+			
+		    // 시/군/구 옵션을 채우는 함수 (재사용을 위해 별도로 정의)
+		    function populateCities(provinceId, selectedCityId) {
+
+		        if (Number(provinceId) === 0) {
+					citySelect.innerHTML = '<option value="0" selected disabled>전체 시/군/구</option>';
+					return;
+				}else{
+					citySelect.innerHTML = '<option value="0">전체 시/군/구</option>';
+				}
+
+		        cityList.forEach(function(city) {
+		            const cityProvinceId = Number(city.province);
+		            if (cityProvinceId === Number(provinceId)) {
+		                const optionElement = document.createElement('option');
+		                optionElement.value = city.id;
+		                optionElement.textContent = city.city;
+		                
+		                // initialCity가 현재 도시와 일치하면 선택 (selected)
+		                if (Number(city.id) === Number(selectedCityId)) { 
+		                    optionElement.selected = true;
+		                }
+		                
+		                citySelect.appendChild(optionElement);
+		            }
+		        });
+		    }
+
+			// 1. 페이지 로드 시 초기값 처리
+			if(Number(initialProvince) !== 0){
+		        // 초기 시/도 값과 초기 시/군/구 값을 사용하여 옵션 채우기
+				populateCities(initialProvince, initialCity); 
+			} else {
+		        // 초기 시/도 값이 없으면 기본 옵션만 표시
+		        citySelect.innerHTML = '<option value="0" selected disabled>전체 시/군/구</option>';
+		    }
+			
+		    // 2. 시/도 변경 시 이벤트 처리
+		    provinceSelect.addEventListener("change", function(){
+		        const selectedProvinceId = Number(this.value);
+		        
+		        // 시/도를 변경했으므로, 선택된 시/군/구 값은 초기화 (null 전달)
+		        populateCities(selectedProvinceId, null);
+		        
+				search();
+		    });
+			
+		});
+
+		// 🎯 필터링 요청 및 화면 갱신 함수
+		function search(){
+			const filterForm = document.getElementById('filterForm');
+			const form = new FormData(filterForm);
+			fetch('/filterRegion', {
+				method: 'POST',
+				body: form
+				})
+			  .then(response => {
+                  if (!response.ok) {
+                      throw new Error('HTTP error! status: ' + response.status);
+                  }
+                  return response.json();
+              })
+			  .then(data => {
+			    console.log('받아온 데이터:', data);
+                updateClubLists(data);
+			  })
+			  .catch(error => {
+			    console.error('Fetch 오류:', error);
+			  });
+		}
+	</script>
+	
+	<script>
+        // 날짜 형식을 'yyyy.MM.dd'로 포맷하는 헬퍼 함수
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            // 서버에서 넘어온 Timestamp 값을 Date 객체로 변환
+            const date = new Date(dateString); 
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}.${month}.${day}`;
+        }
+
+        // 개별 모임 카드 HTML을 생성하는 함수
+        function createClubCard(club) {
+            // 기본 이미지 URL (두 목록에서 사용되던 기본 이미지 중 하나로 통일)
+            const defaultImg = 'https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=1974&auto=format&fit=crop';
+            
+            // 이미지 경로 결정
+            let clubImgSrc;
+            if (club.clubImg && club.clubImg.trim() !== "") {
+                // Thymeleaf 변수 대신 직접 경로 지정
+                clubImgSrc = `${club.clubImg}`; 
+            } else {
+                clubImgSrc = defaultImg;
+            }
+
+            // 날짜 포맷
+            const formattedDate = formatDate(club.created);
+
+            return `
+                <a href="/club/${club.id}" class="text-decoration-none">
+                    <div class="card-item fade-in visible"> 
+                        <img src="${clubImgSrc}" class="card-image" alt="모임 이미지">
+                        <div class="card-content">
+                            <h3 class="card-title">${club.clubName}</h3>
+                            <div class="card-meta">
+                                <span>
+                                    <i class="bi bi-calendar-event"></i>
+                                    <span>${formattedDate}</span>
+                                </span>
+                                <span>
+                                    <i class="bi bi-people-fill"></i>
+                                    <span>${club.memberCount}</span>명
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            `;
+        }
+
+        // 전체 모임 목록을 갱신하는 핵심 함수
+        function updateClubLists(data) {
+            const popularGrid = document.getElementById('popular-grid');
+            const newGrid = document.getElementById('new-grid');
+
+            // 1. 인기 모임 목록 갱신
+            if (data.popularClubList && data.popularClubList.length > 0) {
+                popularGrid.innerHTML = data.popularClubList.map(club => createClubCard(club)).join('');
+            } else {
+                popularGrid.innerHTML = '<p class="text-center text-secondary mt-4">인기 모임이 없습니다.</p>';
+            }
+            
+            // 2. 새로운 모임 목록 갱신
+            if (data.newClubList && data.newClubList.length > 0) {
+                newGrid.innerHTML = data.newClubList.map(club => createClubCard(club)).join('');
+            } else {
+                 newGrid.innerHTML = '<p class="text-center text-secondary mt-4">새로운 모임이 없습니다.</p>';
+            }
+        }
+
+		// 알림 클릭 시: 삭제 요청 -> 성공 시 URL 이동
+		function readAndDelete(notiId, targetUrl) {
+			console.log("알림 삭제 요청: " + notiId);
+
+			fetch('/api/notifications/' + notiId, {
+				method: 'DELETE',
+			})
+				.then(response => {
+					// 성공하든 실패하든 사용자는 해당 페이지로 이동시켜줌
+					window.location.href = targetUrl;
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					window.location.href = targetUrl;
+				});
+		}
+
+		// 기존 모달 실행 코드 (조건부)
+		document.addEventListener('DOMContentLoaded', function () {
+			var infoModalElement = document.getElementById('infoModal');
+			if (infoModalElement) {
+				var myModal = new bootstrap.Modal(infoModalElement);
+				myModal.show();
+			}
+		});
+		
+		document.addEventListener('DOMContentLoaded', function () {
+			var myModal = new bootstrap.Modal(document.getElementById('infoModal'));
+			myModal.show();
+		});
+	</script>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- CSRF 토큰 -->
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	<title th:text="|${post.title} - 자유게시판 - NEIGHBUS|">자유게시판 게시글 상세 - NEIGHBUS</title>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/navibar.css">
+    <link rel="stylesheet" href="/css/custom-modal.css">
+    <script src="/js/custom-modal.js"></script>
+    
+	<style>
+		/* NEIGHBUS 디자인 변수 적용 */
+		:root {
+            --primary: #A67C52;
+            --primary-dark: #8D6E63;
+            --primary-light: #C9A88A;
+            --accent-gold: #D4AF87;
+            --accent-red: #C87E7E;
+            --accent-red-dark: #B36A6A;
+            --bg-ivory: #FFF8F0; /* 메인 배경 */
+            --bg-warm: #FFF5EB;
+            --bg-cream: #FAF0E6; /* 목록 버튼 배경 */
+            --card-bg: #FFFBF7; /* 게시글/댓글 영역 배경 */
+            --secondary-lighter: #FAF0E6;
+            --text-primary: #5D4037; /* 진한 갈색 텍스트 */
+            --text-secondary: #8D6E63; /* 연한 갈색 텍스트 */
+            --text-light: #A1887F;
+            --border-color: #E8D7C3; /* 경계선 */
+            --shadow-color: rgba(166, 124, 82, 0.1);
+            --shadow-hover: rgba(166, 124, 82, 0.2);
+            --white: #FFFFFF;
+        }
+
+		
+		body {
+		    font-family: 'SUIT', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+		    background: var(--bg-ivory);
+		    color: var(--text-primary);
+		    margin: 0;
+		    font-weight: 400;
+		}
+
+		/* .container 라고 쓰면 부트스트랩 네비바까지 영향을 받습니다. 이름을 바꾸세요. */
+		.custom-container {
+		    max-width: 900px;
+		    margin: 40px auto;
+		    padding: 0 20px;
+		}
+
+		.post-container {
+			background: var(--card-bg); /* 배경색 변경 */
+			border-radius: 16px; /* 모서리 조정 */
+			padding: 40px;
+			box-shadow: 0 10px 30px var(--shadow-color); /* 그림자 변경 */
+			border: 1px solid var(--border-color);
+		}
+
+		.post-header .post-title {
+			font-size: 30px;
+			font-weight: 800;
+			margin-bottom: 15px;
+			color: var(--text-primary);
+			line-height: 1.4;
+		}
+
+		.post-meta {
+			display: flex;
+			align-items: center;
+			gap: 20px;
+			color: var(--text-secondary); /* 텍스트 색상 변경 */
+			font-size: 14px;
+			margin-bottom: 30px;
+			padding-bottom: 30px;
+			border-bottom: 1px solid var(--border-color); /* 경계선 색상 변경 */
+		}
+
+		.post-meta span {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.post-content {
+			font-size: 16px;
+			line-height: 1.8;
+			margin-bottom: 40px;
+			color: var(--text-primary);
+			white-space: pre-wrap;
+		}
+
+		.post-content img {
+		    max-width: 100%;  /* auto를 100%로 변경해야 박스 안에 갇힙니다 */
+		    display: block;
+		    margin: 5px 0;
+		}
+
+		/* ▼ 게시글 하단 버튼 (목록/수정/삭제) ▼ */
+		.post-actions-footer {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			margin-top: 40px;
+			padding-top: 30px;
+			border-top: 2px solid var(--secondary-lighter);
+			flex-wrap: wrap;
+		}
+
+		/* 목록으로 버튼 (왼쪽 정렬) */
+		.btn-list {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 12px 24px;
+			background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+			color: var(--white);
+			border-radius: 12px;
+			font-weight: 700;
+			font-size: 15px;
+			text-decoration: none;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			box-shadow: 0 2px 8px rgba(166, 124, 82, 0.25);
+		}
+
+		.btn-list:hover {
+			background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+			transform: translateY(-2px);
+			box-shadow: 0 4px 16px rgba(166, 124, 82, 0.35);
+			color: var(--white);
+		}
+
+		.btn-list::before {
+			content: '📋';
+			font-size: 16px;
+		}
+
+		/* 이전/다음 버튼 */
+		.post-navigation {
+			display: flex;
+			gap: 8px;
+			margin-left: auto;
+		}
+
+		.btn-prev, .btn-next {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 10px 18px;
+			background: var(--card-bg);
+			color: var(--text-primary);
+			border: 2px solid var(--border-color);
+			border-radius: 12px;
+			font-weight: 600;
+			font-size: 14px;
+			text-decoration: none;
+			transition: all 0.3s ease;
+		}
+
+		.btn-prev:hover, .btn-next:hover {
+			background: var(--bg-warm);
+			border-color: var(--primary-light);
+			color: var(--primary-dark);
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(166, 124, 82, 0.15);
+		}
+
+		.btn-prev::before {
+			content: '←';
+			font-weight: 700;
+		}
+
+		.btn-next::after {
+			content: '→';
+			font-weight: 700;
+		}
+
+		/* 수정/삭제 버튼 그룹 */
+		.post-actions {
+			display: flex;
+			gap: 8px;
+		}
+
+		/* 수정 버튼 */
+		.btn-edit {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 10px 20px;
+			background: linear-gradient(135deg, var(--accent-gold) 0%, var(--primary-light) 100%);
+			color: var(--white);
+			border: none;
+			border-radius: 12px;
+			font-weight: 600;
+			font-size: 14px;
+			text-decoration: none;
+			transition: all 0.3s ease;
+			box-shadow: 0 2px 6px rgba(212, 175, 135, 0.3);
+		}
+
+		.btn-edit:hover {
+			background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-gold) 100%);
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(212, 175, 135, 0.4);
+			color: var(--white);
+		}
+
+		.btn-edit::before {
+			content: '✏️';
+			font-size: 14px;
+		}
+
+		/* 삭제 버튼 */
+		.btn-delete {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 10px 20px;
+			background: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-red-dark) 100%);
+			color: var(--white);
+			border: none;
+			border-radius: 12px;
+			font-weight: 600;
+			font-size: 14px;
+			text-decoration: none;
+			transition: all 0.3s ease;
+			box-shadow: 0 2px 6px rgba(200, 126, 126, 0.3);
+		}
+
+		.btn-delete:hover {
+			background: linear-gradient(135deg, var(--accent-red-dark) 0%, var(--accent-red) 100%);
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(200, 126, 126, 0.4);
+			color: var(--white);
+		}
+
+		.btn-delete::before {
+			content: '🗑️';
+			font-size: 14px;
+		}
+		
+		/* ▼ 댓글 섹션 ▼ */
+		.comment-section {
+			margin-top: 40px;
+			padding-top: 20px;
+		}
+
+		.comment-header {
+			font-size: 20px;
+			font-weight: 700;
+			margin-bottom: 25px;
+			color: var(--text-primary);
+			border-bottom: 2px solid var(--primary-light);
+			padding-bottom: 10px;
+		}
+
+		#comment-list {
+			list-style: none;
+			padding: 0;
+		}
+
+		.comment-item {
+			display: flex;
+			gap: 15px;
+			padding: 20px 0;
+			border-top: 1px solid var(--border-color);
+		}
+
+		.comment-item:last-child {
+			border-bottom: 1px solid var(--border-color);
+		}
+		
+		.comment-avatar {
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			background-color: var(--primary-light); /* 아바타 색상 변경 */
+			flex-shrink: 0;
+		}
+
+		.comment-body {
+			flex: 1;
+		}
+
+		.comment-info {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 8px;
+		}
+
+		.comment-author {
+			font-weight: 700; /* 강조 */
+			color: var(--text-primary);
+			font-size: 15px;
+		}
+
+		.comment-time {
+			font-size: 12px;
+			color: var(--text-secondary);
+		}
+
+		.comment-content {
+			margin-bottom: 10px;
+			color: var(--text-primary);
+			white-space: pre-wrap;
+		}
+
+		.comment-actions {
+			display: flex;
+			gap: 15px;
+			font-size: 13px;
+		}
+
+		.comment-actions button,
+		.comment-actions a {
+			background: none;
+			border: none;
+			color: var(--text-secondary);
+			cursor: pointer;
+			padding: 0;
+			text-decoration: none;
+			transition: color 0.2s;
+		}
+
+		.comment-actions a:hover {
+			color: var(--primary);
+		}
+		
+		.comment-actions a.comment-delete-btn {
+			color: var(--accent-red); /* 삭제 버튼은 빨간색 유지 */
+		}
+
+		.comment-actions a i,
+		.comment-actions button i {
+			margin-right: 4px;
+		}
+
+		/* ▼ 댓글 작성 폼 ▼ */
+		#comment-form {
+			display: flex;
+			gap: 10px;
+			margin-top: 20px;
+			margin-bottom: 30px;
+			align-items: flex-start;
+			padding: 20px;
+			border: 1px solid var(--border-color);
+			border-radius: 12px;
+			background: var(--bg-warm);
+		}
+
+		#comment-form textarea {
+			flex-grow: 1;
+			border: 1px solid var(--border-color);
+			border-radius: 8px;
+			padding: 12px;
+			resize: vertical;
+			min-height: 80px; /* 최소 높이 증가 */
+			font-family: 'SUIT', sans-serif;
+			background: var(--card-bg);
+			transition: border-color 0.2s;
+		}
+		
+		#comment-form textarea:focus {
+			outline: none;
+			border-color: var(--primary);
+			box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.1);
+		}
+
+		#comment-form button {
+			padding: 12px 20px;
+			border: none;
+			background: var(--primary); /* 메인 색상 적용 */
+			color: var(--white);
+			border-radius: 8px;
+			cursor: pointer;
+			font-weight: 600;
+			transition: background 0.2s, transform 0.2s;
+			flex-shrink: 0; /* 버튼 크기 유지 */
+		}
+		
+		#comment-form button:hover {
+			background: var(--primary-dark);
+			transform: translateY(-1px);
+		}
+		
+		/* 모바일 반응형 (추가) */
+		@media (max-width: 768px) {
+			.container {
+				margin: 20px auto;
+				padding: 0 10px;
+			}
+			.post-container {
+				padding: 20px;
+			}
+			.post-header .post-title {
+				font-size: 24px;
+			}
+			.post-meta {
+				flex-wrap: wrap;
+				gap: 10px;
+			}
+			#comment-form {
+				flex-direction: column;
+			}
+			#comment-form button {
+				width: 100%;
+				padding: 10px;
+			}
+		}
+		
+		.reaction-section {
+			display: flex;
+			gap: 15px;
+			justify-content: center;
+			margin: 30px 0;
+			padding: 20px 0;
+			border-top: 1px solid var(--border-color);
+			border-bottom: 1px solid var(--border-color);
+		}
+
+		.reaction-btn {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 12px 24px;
+			border: 2px solid var(--border-color);
+			background: var(--card-bg);
+			color: var(--text-secondary);
+			border-radius: 50px;
+			font-size: 15px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			font-family: 'SUIT', sans-serif;
+		}
+
+		.reaction-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px var(--shadow-hover);
+		}
+
+		.reaction-btn i {
+			font-size: 18px;
+		}
+
+		.reaction-count {
+			min-width: 20px;
+			text-align: center;
+			font-weight: 700;
+		}
+
+		/* 좋아요 버튼 활성화 */
+		.like-btn.active {
+			background: var(--primary);
+			color: var(--white);
+			border-color: var(--primary);
+		}
+
+		.like-btn.active i {
+			animation: likeAnimation 0.4s ease;
+		}
+
+		/* 싫어요 버튼 활성화 */
+		.dislike-btn.active {
+			background: var(--accent-red);
+			color: var(--white);
+			border-color: var(--accent-red);
+		}
+
+		.dislike-btn.active i {
+			animation: dislikeAnimation 0.4s ease;
+		}
+
+		/* 애니메이션 */
+		@keyframes likeAnimation {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.3); }
+		}
+
+		@keyframes dislikeAnimation {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.3); }
+		}
+
+		/* 모바일 반응형 */
+		@media (max-width: 768px) {
+			.reaction-section {
+				gap: 10px;
+			}
+			.reaction-btn {
+				padding: 10px 18px;
+				font-size: 14px;
+			}
+			.reaction-text {
+				display: none;
+			}
+		}
+
+		/* 신고 버튼 스타일 */
+		.btn-report {
+			display: inline-flex;
+			align-items: center;
+			gap: 5px;
+			padding: 8px 16px;
+			background: linear-gradient(135deg, #FFE8EC 0%, #FFD6DC 100%);
+			color: #BF616A;
+			border: 2px solid #FFD6DC;
+			border-radius: 10px;
+			font-weight: 700;
+			font-size: 13px;
+			text-decoration: none;
+			transition: all 0.3s ease;
+			box-shadow: 0 2px 6px rgba(191, 97, 106, 0.15);
+			cursor: pointer;
+		}
+
+		.btn-report:hover {
+			background: linear-gradient(135deg, #FFD6DC 0%, #FFC4CC 100%);
+			border-color: #D08087;
+			color: #BF616A;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(191, 97, 106, 0.25);
+		}
+
+		.btn-report i {
+			font-size: 12px;
+			animation: flagWave 2s ease-in-out infinite;
+		}
+
+		@keyframes flagWave {
+			0%, 100% { transform: rotate(0deg); }
+			25% { transform: rotate(-10deg); }
+			75% { transform: rotate(10deg); }
+		}
+
+		/* 댓글 신고 버튼 (작은 버전) */
+		.btn-report-small {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			padding: 6px 12px;
+			background: #FFF5F7;
+			color: #D08087;
+			border: 1.5px solid #FFE8EC;
+			border-radius: 8px;
+			font-weight: 600;
+			font-size: 12px;
+			text-decoration: none;
+			transition: all 0.3s ease;
+			cursor: pointer;
+		}
+
+		.btn-report-small:hover {
+			background: linear-gradient(135deg, #FFE8EC 0%, #FFD6DC 100%);
+			border-color: #D08087;
+			color: #BF616A;
+			transform: translateY(-1px);
+			box-shadow: 0 2px 8px rgba(191, 97, 106, 0.2);
+		}
+
+		.btn-report-small i {
+			font-size: 11px;
+		}
+
+		/* 모바일에서 버튼 반응형 */
+		@media (max-width: 768px) {
+			.post-actions-footer {
+				gap: 8px;
+			}
+
+			.btn-list {
+				padding: 10px 18px;
+				font-size: 14px;
+			}
+
+			.post-navigation {
+				width: 100%;
+				justify-content: flex-start;
+			}
+
+			.btn-prev, .btn-next {
+				flex: 1;
+				justify-content: center;
+				font-size: 13px;
+				padding: 10px 14px;
+			}
+
+			.post-actions {
+				width: 100%;
+			}
+
+			.btn-edit, .btn-delete {
+				flex: 1;
+				justify-content: center;
+				font-size: 13px;
+				padding: 10px 16px;
+			}
+
+			.btn-report {
+				padding: 7px 12px;
+				font-size: 12px;
+			}
+
+			.btn-report-text {
+				display: none;
+			}
+		}
+	</style>
+</head>
+			
+<body>
+	<div th:replace="~{include/navibar :: header-nav}"></div>
+	
+	<div class="custom-container">
+		<div class="post-container">
+			<div class="post-header">
+				<h1 class="post-title" th:text="${post.title}">게시글 제목이 여기에 표시됩니다.</h1>
+				<div class="post-meta">
+					<span><i class="fa-regular fa-user"></i> <span th:text="${post.writerNickname}">작성자</span></span>
+					<span><i class="fa-regular fa-clock"></i> <span
+							th:text="${#temporals.format(post.createdAt, 'yyyy.MM.dd HH:mm')}">2025.01.01 10:00</span></span>
+					<span><i class="fa-regular fa-eye"></i> <span th:text="${post.viewCount}">0</span></span>
+				</div>
+			</div>
+
+			<div class="post-content" th:utext="${post.content}">
+				
+			</div>
+			
+			<!-- 좋아요 싫어요 -->
+			<div class="reaction-section">
+				<button class="reaction-btn like-btn" id="likeBtn" th:classappend="${reaction['userReaction'] != null and reaction.userReaction == 1} ? 'active' : ''" onclick="toggleReaction(1)">
+					<i th:class="${reaction['userReaction'] != null and reaction.userReaction == 1} ? 'fa-solid fa-thumbs-up' : 'fa-regular fa-thumbs-up'"></i>
+					<span class="reaction-text">좋아요</span>
+					<span id="like-count" class="reaction-count" th:text="${reaction.likeCount} ?: 0">0</span>
+				</button>
+				<button class="reaction-btn dislike-btn" id="dislikeBtn" th:classappend="${reaction['userReaction'] != null and reaction.userReaction == 2} ? 'active' : ''" onclick="toggleReaction(2)">
+					<i th:class="${reaction != null and reaction['userReaction'] != null and reaction.userReaction == 2} ? 'fa-solid fa-thumbs-down' : 'fa-regular fa-thumbs-down'"></i>
+					<span class="reaction-text">싫어요</span>
+					<span id="dislike-count" class="reaction-count" th:text="${reaction.dislikeCount} ?: 0">0</span>
+				</button>
+			</div>
+			
+
+			<div class="post-actions-footer">
+				<a th:href="@{/freeboard}" class="btn-list">목록으로</a>
+
+				<div class="post-navigation">
+					<a th:if="${post.prev != null}" th:href="@{|/freeboard/${post.prev}|}" class="btn-prev">이전</a>
+					<a th:if="${post.next != null}" th:href="@{|/freeboard/${post.next}|}" class="btn-next">다음</a>
+				</div>
+
+				<div class="post-actions" th:if="${currentUserId != 0 and currentUserId == post.writer}">
+					<a th:href="@{|/freeboard/edit/${post.id}|}" class="btn-edit">수정</a>
+					<a th:href="@{|/freeboard/delete/${post.id}|}" class="btn-delete"
+						onclick="event.preventDefault(); showModal('confirm', '삭제 확인', '정말로 삭제하시겠습니까?', () => { location.href = this.href; });">삭제</a>
+				</div>
+
+				<a href="#" class="btn-report"
+				   data-bs-toggle="modal"
+				   data-bs-target="#reportModal"
+				   th:attr="data-report-type='POST', data-report-target-id=${post.id}">
+					<i class="fa-solid fa-flag"></i> <span class="btn-report-text">신고</span>
+				</a>
+			</div>
+
+			<div class="comment-section">
+				<h2 class="comment-header">댓글 <span th:text="${#lists.size(comments)}">0</span>개</h2>
+
+				<form id="comment-form">
+					<input type="hidden" id="freeboardId" name="freeboard" th:value="${post.id}">
+					<textarea id="commentContent" name="content" placeholder="댓글을 입력하세요..." required></textarea>
+					<button type="submit" id="submitCommentBtn">등록</button>
+				</form>
+
+				<ul id="comment-list">
+					<li class="comment-item" th:each="comment : ${comments}" th:id="|comment-${comment.id}|"
+						th:attr="data-writer-id=${comment.writer}">
+						<div class="comment-avatar">
+						</div>
+						<div class="comment-body">
+							<div class="comment-info">
+								<span class="comment-author" th:text="${comment.nickname}">익명</span>
+								<span class="comment-time"
+									th:text="${#temporals.format(comment.createdAt, 'yyyy.MM.dd HH:mm')}">2025.11.04 11:00</span>
+							</div>
+							<div class="comment-content" th:text="${comment.content}">댓글 내용입니다.</div>
+							<div class="comment-actions">
+								<a href="#" class="comment-delete-btn"
+									th:if="${currentUserId != 0 and currentUserId == comment.writer}"
+									th:attr="data-comment-id=${comment.id}"
+									onclick="deleteComment(this.getAttribute('data-comment-id')); return false;">
+									<i class="fa-regular fa-trash-can"></i> 삭제
+								</a>
+								<a href="#" class="btn-report-small"
+								   data-bs-toggle="modal"
+								   data-bs-target="#reportModal"
+								   th:attr="data-report-type='COMMENT', data-report-target-id=${comment.id}">
+									<i class="fa-solid fa-flag"></i> 신고
+								</a>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	                <div th:replace="~{fragments/reportModal :: reportModal}"></div>			
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			document.getElementById('comment-form').addEventListener('submit', function (event) {
+				event.preventDefault();
+
+				const freeboardId = document.getElementById('freeboardId').value;
+				const content = document.getElementById('commentContent').value;
+
+				const commentData = {
+					freeboard: freeboardId,
+					content: content
+				};
+
+				fetch('/freeboard/comment', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(commentData)
+				})
+					.then(response => {
+						return response.text().then(text => {
+							return {
+								status: response.status,
+								ok: response.ok,
+								text: text
+							};
+						});
+					})
+					.then(response => {
+						if (response.ok) {
+							showModal('success', '등록 완료', '댓글이 성공적으로 등록되었습니다.', () => {
+                                location.reload();
+                            });
+						} else {
+							showModal('error', '등록 실패', '댓글 등록에 실패했습니다. (상태 코드: ' + response.status + ')');
+						}
+					})
+					.catch(error => {
+						console.error('Error:', error);
+						showModal('error', '오류', '스크립트 오류가 발생했습니다: ' + error.message);
+					});
+			});
+		});
+
+		function deleteComment(commentId) {
+            showModal('confirm', '삭제 확인', '정말로 삭제하시겠습니까?', () => {
+                fetch(`/freeboard/comment/${commentId}`, {
+				method: 'DELETE'
+			})
+				.then(response => {
+					return response.text().then(text => {
+						return {
+							status: response.status,
+							ok: response.ok,
+							text: text
+						};
+					});
+				})
+				.then(response => {
+					if (response.ok) {
+						showModal('success', '삭제 완료', '댓글이 삭제되었습니다.', () => {
+                            const commentElement = document.getElementById(`comment-${commentId}`);
+                            if (commentElement) {
+                                commentElement.remove();
+                            }
+                        });
+					} else {
+						showModal('error', '삭제 실패', '댓글 삭제에 실패했습니다. (상태 코드: ' + response.status + ')');
+					}
+				})
+					.catch(error => {
+					console.error('Error:', error);
+					showModal('error', '오류', '스크립트 오류가 발생했습니다: ' + error.message);
+				});
+            });
+		}
+		
+
+		// 좋아요 버튼 활성화 메서드
+		function toggleReaction(reactionType) {
+			const likeBtn = document.getElementById('likeBtn');
+			const dislikeBtn = document.getElementById('dislikeBtn');
+			const likeIcon = likeBtn.querySelector('i');
+			const dislikeIcon = dislikeBtn.querySelector('i');
+			const isLike = likeBtn.classList.contains('active');      //좋아요 active 여부
+			const isDislike = dislikeBtn.classList.contains('active');   //싫어요 active 여부
+			const likeCount = document.getElementById('like-count');
+			const dislikeCount = document.getElementById('dislike-count');
+			
+			// CSRF 토큰 가져오기
+			const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+			const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+			
+			// 1. 둘 다 active가 없으면 - 새로 추가ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+			if(!isLike && !isDislike){
+				console.log("1");
+				fetch("/freeboard/api/insertReaction", {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						[csrfHeader]: csrfToken
+					},
+					body: JSON.stringify({
+						reactionType: reactionType,
+						freeboardId: document.getElementById('freeboardId').value
+					})
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log(data);
+					if(data){
+						if (reactionType === 1) { //좋아요 버튼 눌렀으면
+							likeBtn.classList.add('active');
+							likeIcon.classList.replace('fa-regular', 'fa-solid');
+						}else if(reactionType === 2){ //싫어요 버튼 눌렀으면
+							dislikeBtn.classList.add('active');
+							dislikeIcon.classList.replace('fa-regular', 'fa-solid');
+						}
+						likeCount.innerText = data.likeCount;
+						dislikeCount.innerText = data.dislikeCount;
+					}
+				})
+				.catch(error => {
+					console.log(error);
+				});
+			}
+			// 2. 좋아요 버튼 눌렀는데 이미 좋아요가 active면 - 삭제ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+			else if(reactionType === 1 && isLike){
+			console.log("2");
+				fetch("/freeboard/api/deleteReaction", {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json',
+						[csrfHeader]: csrfToken
+					},
+					body: JSON.stringify({
+						freeboardId: document.getElementById('freeboardId').value
+					})
+				})
+				.then(response => response.json())
+				.then(data => {
+				console.log(data);
+					if(data){
+						likeBtn.classList.remove('active');
+						likeIcon.classList.replace('fa-solid', 'fa-regular');
+						likeCount.innerText = data.likeCount;
+						dislikeCount.innerText = data.dislikeCount;
+					}
+				})
+				.catch(error => {
+					console.log(error);
+				});
+			}
+			// 3. 싫어요 버튼 눌렀는데 이미 싫어요가 active면 - 삭제ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+			else if(reactionType === 2 && isDislike){
+			console.log("3");
+				fetch("/freeboard/api/deleteReaction", {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json',
+						[csrfHeader]: csrfToken
+					},
+					body: JSON.stringify({
+						freeboardId: document.getElementById('freeboardId').value
+					})
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log(data);
+					if(data){
+						dislikeBtn.classList.remove('active');
+						dislikeIcon.classList.replace('fa-solid', 'fa-regular');
+						likeCount.innerText = data.likeCount;
+						dislikeCount.innerText = data.dislikeCount;
+					}
+				})
+				.catch(error => {
+					console.log(error);
+				});
+			}
+			// 4. 좋아요↔싫어요 전환ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+			else {
+			console.log("4");
+				fetch("/freeboard/api/updateReaction", {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+						[csrfHeader]: csrfToken
+					},
+					body: JSON.stringify({
+						reactionType: reactionType,
+						freeboardId: document.getElementById('freeboardId').value
+					})
+				})
+				.then(response => response.json())
+				.then(data => {
+				console.log(data);
+					if(data){
+						if(reactionType === 1){ // 좋아요로 전환
+							dislikeBtn.classList.remove('active');
+							dislikeIcon.classList.replace('fa-solid', 'fa-regular');
+							likeBtn.classList.add('active');
+							likeIcon.classList.replace('fa-regular', 'fa-solid');
+						} else { // 싫어요로 전환
+							likeBtn.classList.remove('active');
+							likeIcon.classList.replace('fa-solid', 'fa-regular');
+							dislikeBtn.classList.add('active');
+							dislikeIcon.classList.replace('fa-regular', 'fa-solid');
+						}
+						likeCount.innerText = data.likeCount;
+						dislikeCount.innerText = data.dislikeCount;
+					}
+				})
+				.catch(error => {
+					console.log(error);
+				});
+			}
+		}
+				
+			
+			
+			
+			
+	</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/report.js"></script>
+</body>
+
+</html>
