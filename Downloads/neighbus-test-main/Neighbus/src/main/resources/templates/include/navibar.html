@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<header th:fragment="header-nav" id="header">
+    <!-- nb-navbar 클래스 추가: 네비게이션 바 전체 컨테이너 격리 -->
+	<nav class="navbar navbar-expand-lg fixed-top nb-navbar">
+		<div class="container">
+            <!-- nb-brand 클래스 추가 -->
+			<a class="navbar-brand nb-brand" href="/">NEIGHBUS</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav mx-auto">
+                    <!-- nb-nav-link 클래스 추가: 메뉴 링크 격리 -->
+					<li class="nav-item">
+						<a class="nav-link nb-nav-link" href="/about">소개</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link nb-nav-link" href="/club">동아리</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link nb-nav-link" href="/freeboard">게시판</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link nb-nav-link" href="/gallery">갤러리</a>
+					</li>
+				</ul>
+
+				<div class="d-flex align-items-center gap-2" sec:authorize="!isAuthenticated()">
+                    <!-- nb-btn-outline, nb-btn-primary 클래스 추가 -->
+					<a href="/account/login" class="btn btn-outline-primary btn-sm nb-btn-outline">로그인</a>
+					<a href="/account/signup" class="btn btn-primary btn-sm nb-btn-primary">회원가입</a>
+				</div>
+
+				<div class="d-flex align-items-center gap-3" sec:authorize="isAuthenticated()">
+
+					<!--알림-->
+					<a href="#" onclick="openNotificationModal(); return false;"
+						class="position-relative text-dark text-decoration-none nb-icon-link">
+						<i class="bi bi-bell" style="font-size: 1.4rem;"></i>
+
+						<span th:if="${unreadCount != null and unreadCount > 0}"
+							class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+							style="font-size: 0.6rem;">
+							<span th:text="${unreadCount}"></span>
+						</span>
+					</a>
+					<!--마이페이지-->
+					<a href="/mypage" class="nb-profile-link">
+						<img th:src="${#authentication.principal.image}"
+							class="rounded-circle border nb-profile-img" style="width:38px; height:38px; object-fit:cover;" alt="프로필">
+					</a>
+
+				</div>
+
+				<div class="dropdown">
+					<button class="btn p-0 border-0 bg-transparent nb-dropdown-btn ms-3" type="button" data-bs-toggle="dropdown">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<!-- nb-dropdown-menu 클래스 추가 -->
+					<ul class="dropdown-menu dropdown-menu-end nb-dropdown-menu">
+						<li><a class="dropdown-item nb-dropdown-item" href="/notice">공지사항</a></li>
+						<li><a class="dropdown-item nb-dropdown-item" href="/club/myClubPage">내 동아리</a></li>
+						<li><a class="dropdown-item nb-dropdown-item" href="/recruitment/myRecruitments">나의 모임</a></li>
+						<li><a class="dropdown-item nb-dropdown-item" href="/friend/list">친구 목록</a></li>
+						<li><a class="dropdown-item nb-dropdown-item" href="/friend/list">채팅 목록</a></li>
+						<li><a class="dropdown-item nb-dropdown-item" href="/inquiry">문의 하기</a></li>
+						<li>
+							<hr class="dropdown-divider">
+						</li>
+						<li>
+							<form action="/logout" method="post" class="m-0" sec:authorize="isAuthenticated()">
+								<button type="submit" class="dropdown-item text-danger nb-dropdown-item">로그아웃</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+    <div th:replace="~{fragments/notificationModal :: notificationModal}"></div>
+
+    <!-- Global Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/main.js"></script>
+</header>
+</html>

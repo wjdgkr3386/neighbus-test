@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <style>
+        :root {
+            --primary: #A67C52;
+            --primary-dark: #8D6E63;
+            --primary-light: #C9A88A;
+            --bg-ivory: #FFF8F0;
+            --bg-warm: #FFF5EB;
+            --bg-cream: #FAF0E6;
+            --card-bg: #FFFBF7;
+            --text-primary: #5D4037;
+            --text-secondary: #8D6E63;
+            --text-light: #A1887F;
+            --border-color: #E8D7C3;
+            --shadow-color: rgba(166, 124, 82, 0.15);
+            --white: #FFFFFF;
+            --accent-red: #C87E7E;
+        }
+
+        /* 동아리 신고 모달과 동일한 스타일 적용 */
+        .report-modal .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .report-modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .report-modal .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .report-modal .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s;
+            opacity: 1;
+        }
+
+        .report-modal .btn-close:hover {
+            color: var(--text-primary);
+        }
+
+        .report-modal .modal-body {
+            padding: 2rem;
+        }
+
+        .report-modal .form-label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .report-modal .form-select,
+        .report-modal .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: 'SUIT', -apple-system, sans-serif;
+            transition: border-color 0.2s;
+        }
+
+        .report-modal .form-select:focus,
+        .report-modal .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .report-modal .form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .report-modal .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .report-modal .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .report-modal .btn-secondary {
+            background: var(--bg-cream);
+            color: var(--text-primary);
+        }
+
+        .report-modal .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .report-modal .btn-primary {
+            background: var(--accent-red);
+            color: var(--white);
+        }
+
+        .report-modal .btn-primary:hover {
+            background: #B36A6A;
+            transform: translateY(-1px);
+        }
+
+        .report-modal .alert {
+            border-radius: 8px;
+            border: 1px solid #FFE8B2;
+            background: #FFF5EB;
+            color: var(--text-secondary);
+            padding: 1rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .report-modal .mb-3 {
+            margin-bottom: 1rem;
+        }
+
+        .report-modal .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div th:fragment="reportModal" class="modal fade report-modal" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reportModalLabel">신고하기</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="reportForm">
+                <div class="modal-body">
+                    <input type="hidden" id="report-type" name="type">
+                    <input type="hidden" id="report-target-id" name="targetId">
+                    <input type="hidden" id="report-reporter-id" name="reporterId" th:value="${#authentication.principal.id}" sec:authorize="isAuthenticated()">
+                    <input type="hidden" id="report-reporter-id-guest" name="reporterId" value="0" sec:authorize="!isAuthenticated()">
+
+                    <div class="mb-4">
+                        <label for="report-category" class="form-label">신고 종류를 선택해주세요</label>
+                        <select class="form-select" id="report-category" name="category" required>
+                            <option value="" selected disabled>선택하세요</option>
+                            <option value="폭력">폭력</option>
+                            <option value="도박">도박</option>
+                            <option value="음란">음란</option>
+                            <option value="사기">사기</option>
+                            <option value="범죄">범죄</option>
+                            <option value="사이비">사이비</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="report-reason" class="form-label">신고 사유를 상세히 작성해주세요</label>
+                        <textarea class="form-control" id="report-reason" name="reason" rows="4" placeholder="신고 사유를 상세히 작성해주세요.&#10;&#10;예시:&#10;- 어떤 내용이 문제인지&#10;- 언제 발견했는지&#10;- 어떤 규칙을 위반했는지" required></textarea>
+                    </div>
+
+                    <div sec:authorize="!isAuthenticated()" class="alert alert-warning" role="alert">
+                        로그인하지 않은 경우, 신고 처리 과정에서 불이익을 받을 수 있습니다.
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">신고하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

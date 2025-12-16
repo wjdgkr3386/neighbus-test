@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내가 가입한 모임 - NEIGHBUS</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <link href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/navibar.css">
+
+    <style>
+        /* 네비바와 동일한 색상 팔레트 정의 */
+        :root {
+            --bg-ivory: #FFF8F0;          /* 배경색 */
+            --bg-ivory-dark: #FFF5EB;     /* 배경 그라데이션용 */
+            --text-main: #5D4037;         /* 메인 텍스트 (진한 갈색) */
+            --text-sub: #8D6E63;          /* 서브 텍스트 (연한 갈색) */
+            --primary-color: #A67C52;     /* 포인트 컬러 (중간 갈색) */
+            --border-color: rgba(166, 124, 82, 0.2); /* 테두리 연한색 */
+        }
+
+        body {
+            font-family: 'SUIT', sans-serif;
+            background-color: var(--bg-ivory);
+            color: var(--text-main);
+            /* 네비바가 fixed-top이므로 상단 여백 필수 */
+            padding-top: 100px; 
+            min-height: 100vh;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        /* 카드 디자인 */
+        .custom-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px; /* 둥근 모서리 */
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(166, 124, 82, 0.05);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .custom-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(166, 124, 82, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        /* 카드 상단 이미지 영역 (배경) */
+        .card-top-bg {
+            height: 80px;
+            background: linear-gradient(135deg, rgba(166, 124, 82, 0.1), rgba(166, 124, 82, 0.05));
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+        }
+
+        /* 상태 뱃지 */
+        .status-badge {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--primary-color);
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* 자세히 보기 버튼 */
+        .btn-detail {
+            background-color: var(--bg-ivory);
+            color: var(--primary-color);
+            font-weight: 700;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px;
+            transition: all 0.2s;
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-detail:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* 텍스트 유틸리티 */
+        .text-brown { color: var(--text-main) !important; }
+        .text-primary-brown { color: var(--primary-color) !important; }
+        .fw-800 { font-weight: 800; }
+    </style>
+</head>
+
+<body>
+
+    <div th:replace="~{include/navibar :: header-nav}"></div>
+
+    <div class="container mb-5" style="max-width: 1100px;">
+        
+        <div class="d-flex align-items-end justify-content-between mb-5 border-bottom pb-3" style="border-color: var(--border-color) !important;">
+            <div>
+                <h2 class="fw-800 m-0" style="font-size: 2rem;">내가 가입한 모임</h2>
+                <p class="m-0 mt-2" style="color: var(--text-sub);">현재 참여 중인 모임 목록을 확인하세요.</p>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(recruitmentList)}" class="text-center py-5 bg-white rounded-4 border shadow-sm" style="border-color: var(--border-color);">
+            <div class="mb-3">
+                <i class="bi bi-emoji-frown" style="font-size: 4rem; color: #D7CCC8;"></i>
+            </div>
+            <h4 class="fw-bold mb-2">가입한 모임이 없습니다.</h4>
+            <p class="mb-4" style="color: var(--text-sub);">새로운 이웃들과 함께 취미를 즐겨보세요!</p>
+            
+            <a href="/" class="btn btn-lg px-4 py-2 text-white fw-bold rounded-3" 
+               style="background-color: var(--primary-color); border: none;">
+                모임 둘러보기
+            </a>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(recruitmentList)}" class="row g-4">
+            <div th:each="recruitment : ${recruitmentList}" class="col-12 col-md-6 col-lg-4">
+                <div class="custom-card">
+                    
+                    <div class="card-top-bg">
+                        <span class="status-badge">
+                            <i class="bi bi-check-circle-fill me-1"></i> 참여중
+                        </span>
+                    </div>
+
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        <h3 class="fs-5 fw-bold mb-3 text-truncate" th:text="${recruitment.title}">
+                            모임 제목이 들어갑니다
+                        </h3>
+
+                        <div class="mb-4 small" style="color: var(--text-sub);">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-person-fill me-2 text-primary-brown"></i>
+                                <span class="text-truncate">작성자: <span class="fw-semibold text-brown" th:text="${recruitment.writer}">User</span></span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-calendar-check-fill me-2 text-primary-brown"></i>
+                                <span>모임일: <span class="fw-semibold text-brown" th:text="${recruitment.meetingDate}">2025-00-00</span></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto">
+                            <a th:href="@{/recruitment/{id}(id=${recruitment.id})}" class="btn-detail text-decoration-none">
+                                자세히 보기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
